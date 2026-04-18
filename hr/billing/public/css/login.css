@@ -1,0 +1,120 @@
+
+
+  #login{
+    width: 100dvw;
+    height: 100dvh;
+    position: relative;
+    background-color: var(--blue-background);
+    
+  }
+#login_container{
+    background-color: var(--blue-background);
+    width: 30%;
+    /* color: var(--white-color); */
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50% , -10%);
+    height: fit-content; 
+
+    display: flex;
+    /* justify-self: unset; */
+    gap: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+ 
+
+}
+#logo_login{
+    height: 40px;
+    width: auto;
+}
+#login_outer_box{
+    width: 100%;
+    height: fit-content;
+   
+    /* background-color: var(--blue-background); */
+    background-color: var(--white-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 400;
+    gap: .5rem;
+    border-radius: .3rem;
+}
+#login_outer_box form{
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+}
+#login_outer_box form button{
+    margin-top: 1rem;
+    /* background-color: white; */
+    background-color: var(--blue-background);
+    border: none;
+    padding: .5rem;
+    border-radius: .3rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--white-color);
+}
+#login_outer_box form input{
+    padding: .5rem;
+    border-radius: .3rem;
+    /* border: none; */
+    border: 1px solid var(--blue-background);
+    outline: 1px solid var(--white-color);
+}
+#login_outer_box form input::placeholder{
+    font-size: 1rem;
+}
+.forgot-div{
+    display: flex;
+    justify-content: space-between;
+}
+.forgot-div a{
+    color: var(--blue-background);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: var(--transitiom-all);
+}
+.forgot-div a:hover{
+    text-decoration: underline;
+}
+.error{
+    color: var(--warning);
+    font-size: .8rem;
+}
+
+@media only screen and (max-width : 1000px){
+    #login_container{
+       
+        width: 40%;
+
+    }
+}
+
+@media only screen and (max-width : 768px){
+    #login_container{
+     
+        width: 60%;
+
+    }
+}
+@media only screen and (max-width : 512px){
+    #login_container{
+    
+        width: 80%;
+
+    }
+}
+@media only screen and (max-width :300px){
+    #login_container{
+        
+        width: 100%;
+
+    }
+}

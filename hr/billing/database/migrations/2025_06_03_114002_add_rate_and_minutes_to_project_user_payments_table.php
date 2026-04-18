@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('project_user_payments', function (Blueprint $table) {
+            //     
+          $table->decimal('hourly_rate_at_payment', 8, 2)->nullable();
+        $table->integer('minutes_paid')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('project_user_payments', function (Blueprint $table) {
+            //
+                $table->dropColumn('hourly_rate_at_payment');
+            $table->dropColumn('minutes_paid');
+        });
+    }
+};

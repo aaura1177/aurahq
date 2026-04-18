@@ -1,0 +1,139 @@
+
+  
+#data_section{
+    padding: 1rem;
+  
+    transition: var(--transition-all);
+    padding: 1rem;
+    
+
+}
+#dashboard-page{
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+    /* border-top: 3px solid red; */
+    border-radius: .3rem;
+    /* margin-left: 1rem; */
+    /* margin-right: rem; */
+    box-sizing: border-box;
+    
+}
+#dashboard-page .cards-container{
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+#dashboard-page .card-dashboard{
+    display: flex;
+    flex-direction: column;
+    color: white;
+    width: calc(25% - 3rem/4);
+    height: fit-content;
+    position: relative;
+    border-radius: .1rem;
+    cursor: pointer;
+}
+#dashboard-page .card-dashboard:hover .card-info i{
+    transform: scale(1.1)
+}
+#dashboard-page .card-dashboard:hover .card-info h1{
+    transform: scale(1.1)
+}
+#dashboard-page .card-dashboard h1{
+    font-size: 3rem;
+    font-weight: bold;
+    transition: var(--transition-all);
+
+}
+.card-dashboard .card-info{
+    padding: 1rem;
+}
+.card-dashboard .card-info i{
+    position: absolute;
+    transition: var(--transition-all);
+    top: 1rem;
+    right: 1rem;
+overflow: hidden;
+    font-size: 80px;
+    
+
+    
+}
+.card-dashboard .more-info{
+    /* background-color: green; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    padding: .1rem;
+
+}
+.card-dashboard .more-info i{
+    margin-left: .3rem;
+    background-color: rgb(255, 255, 255);
+    color: var(--text-color-default);
+    border-radius: 50%;
+    padding: .2rem;
+    font-size: 10px;
+}
+  
+
+/* card child colrs  */
+#dashboard-page .card-dashboard:nth-child(1){
+
+    background-color: rgb(27 193 210);
+
+}
+#dashboard-page .card-dashboard:nth-child(1) .more-info{
+    background-color: rgb(22, 120, 131);
+}
+
+
+#dashboard-page .card-dashboard:nth-child(2){
+
+    background-color: rgb(238 139 102);
+
+}
+#dashboard-page .card-dashboard:nth-child(2) .more-info{
+    background-color: rgb(170, 66, 28);
+}
+
+
+#dashboard-page .card-dashboard:nth-child(3){
+
+    background-color: rgb(236 119 106);
+
+}
+#dashboard-page .card-dashboard:nth-child(3) .more-info{
+    background-color: rgb(174, 37, 22);
+}
+
+
+#dashboard-page .card-dashboard:nth-child(4){
+
+    background-color: rgb(241 205 19);
+
+}
+#dashboard-page .card-dashboard:nth-child(4) .more-info{
+    background-color: rgb(201, 168, 2);
+    
+}
+
+@media only screen and (max-width:1100px){
+    #dashboard-page .card-dashboard{
+        width: calc(50% - 1rem/2);
+        
+    }
+   
+}
+
+@media only screen and (max-width:600px){
+    #dashboard-page .card-dashboard{
+        width: calc(100%);
+        
+    }
+   
+}
+

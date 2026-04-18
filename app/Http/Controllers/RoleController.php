@@ -1,0 +1,57 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class RoleController extends Controller implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view roles', only: ['index', 'show']),
+            new Middleware('permission:create roles', only: ['create', 'store']),
+            new Middleware('permission:edit roles', only: ['edit', 'update']),
+            new Middleware('permission:delete roles', only: ['destroy']),
+        ];
+    }
+
+    public function index() {
+        // Fetch roles with permissions and user count dynamically
+        $roles = Role::with('permissions')->withCount('users')->get();
+        return view('roles.index', compact('roles'));
+    }
+
+    public function create() {
+        $permissions = Permission::all();
+        return view('roles.create', compact('permissions'));
+    }
+
+    public function store(Request $request) {
+        $request->validate(['name' => 'required|unique:roles']);
+        $role = Role::create(['name' => $request->name]);
+        if($request->permissions) {
+            $role->syncPermissions($request->permissions);
+        }
+        return redirect()->route('roles.index')->with('success', 'Role created.');
+    }
+
+    public function edit(Role $role) {
+        $permissions = Permission::all();
+        return view('roles.edit', compact('role', 'permissions'));
+    }
+
+    public function update(Request $request, Role $role) {
+        $request->validate(['name' => 'required|unique:roles,name,'.$role->id]);
+        $role->update(['name' => $request->name]);
+        $role->syncPermissions($request->permissions ?? []);
+        return redirect()->route('roles.index')->with('success', 'Role updated.');
+    }
+
+    public function destroy(Role $role) {
+        $role->delete();
+        return redirect()->route('roles.index')->with('success', 'Role deleted.');
+    }
+}

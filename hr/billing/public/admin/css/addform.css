@@ -1,0 +1,15 @@
+#add_data{
+    /* padding: 2rem; */
+    margin: 2rem;
+    border-radius: .3rem;
+    border: 1px solid #989797;
+    padding-bottom: 3rem;
+    border-top: 3px solid var(--lighter-blue-bg);
+}
+#add_data h2{
+    border: 1px solid #3f3f3f;
+    padding-inline-start: 1rem;
+    background-color: var(--light-blue-bg);
+    color: white;
+    font-weight: 400 !important;
+}

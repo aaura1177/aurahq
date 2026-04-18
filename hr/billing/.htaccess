@@ -1,0 +1,27 @@
+# Enable the rewriting engine
+RewriteEngine On
+
+# Force HTTPS for all requests
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Allow Installatron requests (this rule stays as is)
+RewriteCond %{REQUEST_FILENAME} deleteme\.\w+\.php
+RewriteRule (.*) - [L]
+
+# Redirect requests for CSS, JS, and image files to the public folder
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|otf|eot|mp4|webm|ogg|mp3|wav)$ [NC]
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Allow direct access to storage files
+RewriteCond %{REQUEST_URI} ^/storage/
+RewriteRule ^ - [L]
+
+# Rewrite all other requests to index.php inside the public folder if the file or directory doesn't exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/index.php [L]
+
+# Disable directory listing for security
+Options -Indexes

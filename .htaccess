@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Protect Dotfiles (like .env)
+    RewriteRule \.(env|json|lock|git|xml)$ - [F]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes
+    RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+    # Send Requests To Public Directory
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>

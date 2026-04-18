@@ -1,0 +1,128 @@
+/* General Form Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Input Fields */
+fieldset {
+  border: none;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+input.inp {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+input.inp:focus {
+  border-color: #0056b3;
+  outline: none;
+}
+
+/* Icons */
+fieldset i {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #888;
+}
+
+input[type="password"] {
+  padding-left: 30px;
+}
+
+/* Eye Icon */
+#fa_eye {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #888;
+}
+
+/* Button */
+button.btn {
+  width: 100%;
+  padding: 14px;
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button.btn:hover {
+  background-color: #004494;
+}
+
+/* Forgot Section */
+.forgot-section {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.forgot-section a {
+  color: #0056b3;
+  text-decoration: none;
+  margin: 5px;
+}
+
+.forgot-section a:hover {
+  text-decoration: underline;
+}
+
+/* Error Messages */
+span {
+  font-size: 14px;
+  color: red;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 480px) {
+  form {
+      padding: 15px;
+  }
+
+  h3 {
+      font-size: 18px;
+  }
+
+  input.inp {
+      font-size: 14px;
+  }
+
+  button.btn {
+      padding: 12px;
+  }
+}

@@ -1,0 +1,58 @@
+.p-5{
+    padding: .5rem;
+}
+.p-0{
+    padding: 0 !important;
+}
+.h-0{
+    height: 0;
+}
+.width-100{
+    width: 100%;
+}
+.width-50{
+    width: 50%;
+}
+.width-25{
+    width: 25%;
+}
+.font-8{
+    font-size:.8rem;
+}
+.over-hid{
+    overflow: hidden;
+}
+.flex{
+    display: flex;
+}
+.flex-y{
+    display: flex;
+    flex-direction: column;
+}
+.gap-100{
+    gap: 1rem;
+}
+.hor-align-last{
+    align-items: end;
+}
+.hor-align-center{
+    align-items: center;
+}
+.hor-align-start{
+    align-items: start;
+}
+.block{
+    display: block;
+}
+.jus-con-end{
+    justify-content: end;
+}
+.jus-con-start{
+    justify-content: start;
+}
+
+.p-i-100{
+    padding-inline:1rem;
+   
+    
+}

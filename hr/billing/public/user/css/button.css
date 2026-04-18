@@ -1,0 +1,63 @@
+.btn{
+    padding: .3rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    justify-content: start;
+    text-align: center;
+    border: none;
+    /* background-color: none; */
+    border-radius: .1rem;
+    font-weight: 100;
+    cursor: pointer;
+    background-color: transparent;
+}
+.btn:disabled{
+    transform: blur(10px);
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover{
+    transition: none;
+    transform: none;
+    box-shadow: none;
+
+}
+.danger{
+    background-color: #d0001b;
+    color: white;
+}
+.danger-c{
+    color: red;
+}
+.download_bgc{
+    background-color: #86b500;
+    color: white;
+}
+.blue_bgc{
+    background-color: var(--blue-background);
+    color: white !important;
+}
+.blue_bgc_lighter{
+    background-color: var(--lighter-blue-bg);
+}
+.success{
+    background-color: #86b500;
+    color: white !important;
+}
+.edit{
+    background-color: #ffb703;
+    color: white !important;
+}
+button:hover{
+    box-shadow: 4px 4px 12px black, -4px -4px 12px black;
+    /* transform: translateY(-1px); */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  #buttons_container a {
+    text-decoration: none;
+  }
+
+

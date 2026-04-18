@@ -1,0 +1,29 @@
+* {
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    font-family: "Open Sans", serif;
+    box-sizing: border-box;
+    
+    /* overflow: hidden; */
+  }
+  :root {
+    --nav-back-color: #201f1f;
+    --text-color-main: #2d2c2c;
+    --text-color-default: #505155;
+    /* --blue-background: #*/
+    --blue-background: #BFACB5;
+    /* --light-blue-bg: #3373b7; */
+    --light-blue-bg: #444554;
+    --lighter-blue-bg: #636475;
+    --white-color: white;
+    --transition-all: ease-in 0.3s;
+    --border-radius-normal: 0.3rem;
+    --under-line-lighter: #8080802b;
+    --circular: 50%;
+    --transition-main-width :width ease-in .3s;
+    --warning:#b60914;
+    --z-navbar:2;
+  }
+
+  

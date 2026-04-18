@@ -1,0 +1,8 @@
+.main-text-h3{
+    color: var(--text-color-main);
+    padding-bottom: .5rem;
+    /* color: #444444; */
+}
+.h3-bgccc{
+    background-color: #ccc;
+}
