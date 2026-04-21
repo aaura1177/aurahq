@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\AttendanceRecord;
 use App\Models\User;
 use Carbon\Carbon;
@@ -51,7 +52,7 @@ class AttendanceApiController extends Controller
             }
         }
 
-        return response()->json([
+        return ApiJson::ok([
             'employees' => $employees,
             'records' => $records,
             'employee_id' => $employeeId,
@@ -81,7 +82,12 @@ class AttendanceApiController extends Controller
             }
             $summaries[] = ['employee' => $employee, 'present' => $present, 'absent' => $absent, 'off' => $off];
         }
-        return response()->json(['employees' => $employees, 'summaries' => $summaries, 'start_date' => $start->format('Y-m-d'), 'end_date' => $end->format('Y-m-d')]);
+        return ApiJson::ok([
+            'employees' => $employees,
+            'summaries' => $summaries,
+            'start_date' => $start->format('Y-m-d'),
+            'end_date' => $end->format('Y-m-d'),
+        ]);
     }
 
     public function store(Request $request)
@@ -97,20 +103,26 @@ class AttendanceApiController extends Controller
             ['user_id' => $request->user_id, 'date' => $request->date],
             ['status' => $request->status, 'notes' => $request->notes]
         );
-        return response()->json(['message' => 'Saved', 'data' => ['id' => $r->id, 'user_id' => $r->user_id, 'date' => $r->date->format('Y-m-d'), 'status' => $r->status]], 201);
+        return ApiJson::created([
+            'id' => $r->id,
+            'user_id' => $r->user_id,
+            'date' => $r->date->format('Y-m-d'),
+            'status' => $r->status,
+        ], 'Attendance saved successfully');
     }
 
     public function update(Request $request, AttendanceRecord $attendance)
     {
         $request->validate(['status' => 'required|in:present,absent,off', 'notes' => 'nullable|string|max:500']);
         $attendance->update($request->only('status', 'notes'));
-        return response()->json(['message' => 'Updated', 'data' => ['id' => $attendance->id, 'status' => $attendance->status]]);
+        return ApiJson::ok(['id' => $attendance->id, 'status' => $attendance->status], 'Updated');
     }
 
     public function destroy(AttendanceRecord $attendance)
     {
         $attendance->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     private function effectiveStatus(int $userId, Carbon $date): string

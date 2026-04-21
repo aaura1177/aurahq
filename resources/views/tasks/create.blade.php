@@ -44,6 +44,18 @@
             <textarea name="description" class="w-full border rounded-lg p-2.5" rows="3" placeholder="Details..."></textarea>
         </div>
 
+        <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Project <span class="text-slate-400 font-normal">(optional)</span></label>
+            <select name="project_id" class="w-full border rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="">— No project —</option>
+                @foreach($projects as $project)
+                    <option value="{{ $project->id }}" {{ (string) old('project_id') === (string) $project->id ? 'selected' : '' }}>
+                        {{ $project->name }} ({{ $project->client->name }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1">Priority</label>

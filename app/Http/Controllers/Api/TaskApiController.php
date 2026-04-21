@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\Task;
 use App\Models\TaskReport;
 use App\Models\TaskTodo;
@@ -21,7 +22,8 @@ class TaskApiController extends Controller
         elseif ($filter === 'urgent') $query->whereIn('priority', ['urgent', 'critical']);
         elseif ($filter !== 'all') $query->where('frequency', $filter);
         $tasks = $query->latest()->get()->map(fn ($t) => $this->taskToArray($t));
-        return response()->json(['data' => $tasks]);
+
+        return ApiJson::ok($tasks->values()->all());
     }
 
     public function assignments(Request $request)
@@ -34,21 +36,28 @@ class TaskApiController extends Controller
         if ($request->filled('employee_id')) $query->where('assigned_to', $request->employee_id);
         if ($request->filled('status')) $query->where('status', $request->status);
         $tasks = $query->latest()->get()->map(fn ($t) => $this->taskToArray($t));
-        $employees = $user->hasRole(['super-admin', 'admin']) ? User::role('employee')->where('is_active', true)->get(['id', 'name']) : [];
-        return response()->json(['data' => $tasks, 'employees' => $employees]);
+        $employees = $user->hasRole(['super-admin', 'admin'])
+            ? User::role('employee')->where('is_active', true)->get(['id', 'name'])->values()->all()
+            : [];
+
+        return ApiJson::ok([
+            'tasks' => $tasks->values()->all(),
+            'employees' => $employees,
+        ]);
     }
 
     public function show(Request $request, Task $task)
     {
         $user = $request->user();
-        if (!$task->is_active && !$user->hasRole(['super-admin', 'admin'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if (! $task->is_active && ! $user->hasRole(['super-admin', 'admin'])) {
+            return ApiJson::unauthorized();
         }
-        if ($task->assigned_to != $user->id && !$user->hasRole(['super-admin', 'admin']) && $task->category !== 'admin_personal') {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($task->assigned_to != $user->id && ! $user->hasRole(['super-admin', 'admin']) && $task->category !== 'admin_personal') {
+            return ApiJson::unauthorized();
         }
         $task->load(['reports.user', 'assignee', 'creator', 'todos']);
-        return response()->json(['data' => $this->taskToArray($task, true)]);
+
+        return ApiJson::ok($this->taskToArray($task, true));
     }
 
     public function store(Request $request)
@@ -68,7 +77,7 @@ class TaskApiController extends Controller
         $data['status'] = $data['status'] ?? 'pending';
         $data['category'] = $data['category'] ?? 'employee_assignment';
         $task = Task::create($data);
-        return response()->json(['message' => 'Created', 'data' => $this->taskToArray($task)], 201);
+        return ApiJson::created($this->taskToArray($task), 'Task created successfully');
     }
 
     public function update(Request $request, Task $task)
@@ -81,20 +90,21 @@ class TaskApiController extends Controller
             'due_date' => 'nullable|date',
         ]);
         $task->update($request->only('title', 'description', 'priority', 'status', 'due_date'));
-        return response()->json(['message' => 'Updated', 'data' => $this->taskToArray($task)]);
+        return ApiJson::ok($this->taskToArray($task), 'Updated');
     }
 
     public function destroy(Task $task)
     {
         $task->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function toggleStatus(Task $task)
     {
         $task->is_active = !$task->is_active;
         $task->save();
-        return response()->json(['message' => 'Updated', 'data' => ['is_active' => $task->is_active]]);
+        return ApiJson::ok(['is_active' => $task->is_active], 'Updated');
     }
 
     private function taskToArray(Task $task, bool $full = false): array
@@ -128,7 +138,7 @@ class TaskApiController extends Controller
     public function storeReport(Request $request, Task $task)
     {
         if ($request->user()->id != $task->assigned_to && !$request->user()->hasRole(['super-admin', 'admin'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $request->validate(['remark' => 'required|string', 'time_note' => 'nullable|string', 'status' => 'nullable|in:pending,in_progress,completed']);
         TaskReport::create([
@@ -140,59 +150,64 @@ class TaskApiController extends Controller
         if ($request->filled('status')) {
             $task->update(['status' => $request->status]);
         }
-        return response()->json(['message' => 'Report added'], 201);
+        return ApiJson::created(['task_id' => $task->id], 'Report added successfully');
     }
 
     public function updateReport(Request $request, TaskReport $report)
     {
         if ($request->user()->id != $report->user_id && !$request->user()->hasRole(['super-admin', 'admin'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $request->validate(['remark' => 'required|string', 'time_note' => 'nullable|string']);
         $report->update($request->only('remark', 'time_note'));
-        return response()->json(['message' => 'Updated']);
+
+        return ApiJson::ok(['id' => $report->id], 'Updated');
     }
 
     public function deleteReport(Request $request, TaskReport $report)
     {
         if ($request->user()->id != $report->user_id && !$request->user()->hasRole(['super-admin', 'admin'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $report->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function storeTodo(Request $request, Task $task)
     {
         $request->validate(['title' => 'required|string|max:255']);
         $todo = TaskTodo::create(['task_id' => $task->id, 'title' => $request->title, 'status' => 'pending']);
-        return response()->json(['message' => 'Created', 'data' => ['id' => $todo->id]], 201);
+        return ApiJson::created(['id' => $todo->id], 'Todo created successfully');
     }
 
     public function updateTodo(Request $request, TaskTodo $todo)
     {
         $request->validate(['title' => 'required|string|max:255']);
         $todo->update(['title' => $request->title]);
-        return response()->json(['message' => 'Updated']);
+
+        return ApiJson::ok(['id' => $todo->id], 'Updated');
     }
 
     public function updateTodoStatus(Request $request, TaskTodo $todo)
     {
         $request->validate(['status' => 'required|in:pending,in_progress,done']);
         $todo->update(['status' => $request->status]);
-        return response()->json(['message' => 'Updated']);
+
+        return ApiJson::ok(['id' => $todo->id, 'status' => $todo->status], 'Updated');
     }
 
     public function destroyTodo(TaskTodo $todo)
     {
         $todo->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function reviewTask(Request $request, Task $task)
     {
         if (!$request->user()->hasRole(['super-admin', 'admin'])) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $request->validate([
             'rating' => 'nullable|integer|min:1|max:5',
@@ -205,6 +220,10 @@ class TaskApiController extends Controller
             'admin_remark' => $request->admin_remark,
             'admin_private_note' => $request->admin_private_note,
         ]);
-        return response()->json(['message' => 'Review saved']);
+        return ApiJson::ok([
+            'id' => $task->id,
+            'status' => $task->status,
+            'rating' => $task->rating,
+        ], 'Review saved');
     }
 }

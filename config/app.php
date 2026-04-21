@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Monthly revenue target (CEO dashboard fallback when no DB row exists)
+    |--------------------------------------------------------------------------
+    */
+
+    'monthly_revenue_target' => (float) env('MONTHLY_REVENUE_TARGET', 200000),
+
 ];

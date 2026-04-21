@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\GroceryExpense;
 use App\Models\GroceryListItem;
 use Carbon\Carbon;
@@ -47,7 +48,7 @@ class ReportApiController extends Controller
             $catLabels[] = 'variations';
             $catData[] = $varTotal;
         }
-        return response()->json([
+        return ApiJson::ok([
             'daily' => ['total' => $daily['total'], 'items_count' => $daily['items']->count(), 'expenses_count' => $daily['expenses']->count()],
             'weekly' => ['total' => $weekly['total']],
             'monthly' => ['total' => $monthly['total']],

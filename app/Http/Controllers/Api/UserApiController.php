@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,8 +13,11 @@ class UserApiController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::with('roles')->latest()->paginate($request->query('per_page', 15));
-        return response()->json($users);
+        $perPage = (int) $request->query('per_page', 25);
+        $perPage = $perPage > 0 && $perPage <= 100 ? $perPage : 25;
+        $users = User::with('roles')->latest()->paginate($perPage);
+
+        return ApiJson::paginated($users, fn (User $u) => $this->userJson($u));
     }
 
     public function store(Request $request)
@@ -31,13 +35,13 @@ class UserApiController extends Controller
             'is_active' => true,
         ]);
         $user->assignRole($request->role);
-        return response()->json(['message' => 'Created', 'data' => $this->userJson($user)], 201);
+        return ApiJson::created($this->userJson($user), 'User created successfully');
     }
 
     public function show(User $user)
     {
         $user->load('roles');
-        return response()->json(['data' => $this->userJson($user)]);
+        return ApiJson::ok($this->userJson($user));
     }
 
     public function update(Request $request, User $user)
@@ -49,33 +53,43 @@ class UserApiController extends Controller
             'password' => 'nullable|min:6',
         ]);
         if ($user->id === $request->user()->id && $request->filled('is_active') && !$request->boolean('is_active')) {
-            return response()->json(['message' => 'Cannot deactivate yourself'], 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['is_active' => ['You cannot deactivate yourself.']],
+            ], 422);
         }
         $user->update($request->only('name', 'email'));
         if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);
         }
         $user->syncRoles([$request->role]);
-        return response()->json(['message' => 'Updated', 'data' => $this->userJson($user->fresh('roles'))]);
+        return ApiJson::ok($this->userJson($user->fresh('roles')), 'Updated');
     }
 
     public function destroy(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {
-            return response()->json(['message' => 'Cannot delete yourself'], 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['user' => ['You cannot delete yourself.']],
+            ], 422);
         }
         $user->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function toggle(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {
-            return response()->json(['message' => 'Cannot block yourself'], 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['user' => ['You cannot block yourself.']],
+            ], 422);
         }
         $user->is_active = !$user->is_active;
         $user->save();
-        return response()->json(['message' => 'OK', 'data' => ['is_active' => $user->is_active]]);
+        return ApiJson::ok(['is_active' => $user->is_active], 'Updated');
     }
 
     private function userJson(User $user): array

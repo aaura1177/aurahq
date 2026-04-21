@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -11,13 +12,14 @@ class RoleApiController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permissions')->withCount('users')->get()->map(fn ($r) => [
+        $paginator = Role::with('permissions')->withCount('users')->orderBy('name')->paginate(25);
+
+        return ApiJson::paginated($paginator, fn ($r) => [
             'id' => $r->id,
             'name' => $r->name,
             'permissions' => $r->permissions->pluck('name'),
             'users_count' => $r->users_count,
         ]);
-        return response()->json(['data' => $roles]);
     }
 
     public function store(Request $request)
@@ -27,17 +29,17 @@ class RoleApiController extends Controller
         if ($request->filled('permissions')) {
             $role->syncPermissions($request->permissions);
         }
-        return response()->json(['message' => 'Created', 'data' => ['id' => $role->id, 'name' => $role->name]], 201);
+        return ApiJson::created(['id' => $role->id, 'name' => $role->name], 'Role created successfully');
     }
 
     public function show(Role $role)
     {
         $role->load('permissions');
-        return response()->json(['data' => [
+        return ApiJson::ok([
             'id' => $role->id,
             'name' => $role->name,
             'permissions' => $role->permissions->pluck('name'),
-        ]]);
+        ]);
     }
 
     public function update(Request $request, Role $role)
@@ -45,23 +47,24 @@ class RoleApiController extends Controller
         $request->validate(['name' => 'required|string|unique:roles,name,' . $role->id]);
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions ?? []);
-        return response()->json(['message' => 'Updated']);
+        return ApiJson::ok(['id' => $role->id, 'name' => $role->name], 'Updated');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function permissionsList()
     {
-        return response()->json(['data' => Permission::orderBy('name')->pluck('name')]);
+        return ApiJson::ok(Permission::orderBy('name')->pluck('name')->values()->all());
     }
 
     /** Lightweight list for user form dropdowns (names only). */
     public function roleNames()
     {
-        return response()->json(['data' => Role::orderBy('name')->pluck('name')->values()->all()]);
+        return ApiJson::ok(Role::orderBy('name')->pluck('name')->values()->all());
     }
 }

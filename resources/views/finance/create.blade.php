@@ -1,7 +1,18 @@
 @extends('layouts.admin')
 @section('header', 'New Transaction')
 @section('content')
-<div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+@php
+    $expenseCats = \App\Models\Finance::EXPENSE_CATEGORIES;
+    $incomeCats = \App\Models\Finance::INCOME_CATEGORIES;
+@endphp
+<div class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+     x-data="{
+        type: @json(old('type', 'given')),
+        category: @json(old('category', '')),
+        expenseCats: @json($expenseCats),
+        incomeCats: @json($incomeCats),
+        isRecurring: @json((bool) old('is_recurring')),
+     }">
     <form action="{{ route('finance.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
         
@@ -28,7 +39,7 @@
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-bold text-slate-700">Type</label>
-                <select name="type" class="w-full mt-1 border rounded-lg px-4 py-2">
+                <select name="type" x-model="type" class="w-full mt-1 border rounded-lg px-4 py-2">
                     <option value="given">Given (Debit)</option>
                     <option value="received">Received (Credit)</option>
                 </select>
@@ -41,6 +52,37 @@
                     <option value="bank">Bank Transfer</option>
                 </select>
             </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-bold text-slate-700">Category</label>
+            <select name="category" x-model="category" class="w-full mt-1 border rounded-lg px-4 py-2 bg-white">
+                <option value="">Select category…</option>
+                <template x-for="[key, label] in Object.entries(type === 'given' ? expenseCats : incomeCats)" :key="key">
+                    <option :value="key" x-text="label"></option>
+                </template>
+            </select>
+            @error('category')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        <div>
+            <label class="block text-sm font-bold text-slate-700">Venture</label>
+            <select name="venture" class="w-full mt-1 border rounded-lg px-4 py-2 bg-white">
+                @foreach(\App\Models\Finance::VENTURES as $v)
+                    <option value="{{ $v }}" {{ old('venture', 'aurateria') === $v ? 'selected' : '' }}>{{ \App\Models\Finance::ventureLabel($v) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700">
+                <input type="checkbox" name="is_recurring" value="1" x-model="isRecurring" class="rounded border-slate-300">
+                Recurring
+            </label>
+        </div>
+        <div x-show="isRecurring" x-cloak>
+            <label class="block text-sm font-bold text-slate-700">Day of month (1–31)</label>
+            <input type="number" name="recurring_day" min="1" max="31" value="{{ old('recurring_day') }}" class="w-full mt-1 border rounded-lg px-4 py-2" placeholder="e.g. 5">
         </div>
 
         <div>

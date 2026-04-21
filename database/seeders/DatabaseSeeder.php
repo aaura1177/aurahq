@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Permissions
-        $modules = ['users', 'roles', 'finance', 'finance contacts', 'tasks', 'grocery', 'grocery templates', 'grocery expenses', 'reports', 'task reports', 'task todos', 'holidays', 'attendance', 'daily reports'];
+        $modules = ['users', 'roles', 'finance', 'finance contacts', 'revenue targets', 'tasks', 'grocery', 'grocery templates', 'grocery expenses', 'reports', 'task reports', 'task todos', 'holidays', 'attendance', 'daily reports', 'leads', 'lead activities', 'clients', 'projects', 'milestones', 'invoices', 'ventures', 'venture updates'];
         $actions = ['view', 'create', 'edit', 'delete'];
         foreach ($modules as $module) {
             foreach ($actions as $action) {
@@ -30,11 +30,21 @@ class DatabaseSeeder extends Seeder
         
         // Employee Permissions
         $employee->givePermissionTo([
-            'view tasks', 
-            'create task reports', 
+            'view tasks',
+            'create task reports',
             'view task reports',
             'create daily reports',
+            'view leads',
+            'create leads',
+            'edit leads',
+            'create lead activities',
+            'edit lead activities',
+            'delete lead activities',
+            'view projects',
+            'view clients',
         ]);
+
+        $this->call(VentureSeeder::class);
 
         // 3. Users
         if (!User::where('email', 'ethanstark041@gmail.com')->exists()) {

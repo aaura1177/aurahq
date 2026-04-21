@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use Illuminate\Http\Request;
 use OpenAI;
 use App\Models\Task;
@@ -98,12 +101,12 @@ class AiController extends Controller
                         $results[] = "Added {$args['item_name']} to grocery list.";
                     }
                 }
-                if (!empty($results)) {
-                    return response()->json(['message' => implode(' ', $results)]);
+                if (! empty($results)) {
+                    return ApiJson::ok(['results' => $results], implode(' ', $results));
                 }
             }
 
-            return response()->json(['message' => "I heard you, but I wasn't sure what action to take."]);
+            return ApiJson::ok([], "I heard you, but I wasn't sure what action to take.");
         } catch (\Exception $e) {
             Log::error('AI Error: ' . $e->getMessage());
 
@@ -112,7 +115,7 @@ class AiController extends Controller
                 return response()->json(['message' => 'AI Limit Exceeded. Please check your OpenAI billing/credits.'], 429);
             }
 
-            return response()->json(['message' => 'Server Error: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Server Error: '.$e->getMessage()], 500);
         }
     }
 }

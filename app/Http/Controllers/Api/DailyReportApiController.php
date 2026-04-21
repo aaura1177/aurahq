@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\AttendanceRecord;
 use App\Models\DailyReport;
 use App\Models\ReportEditGrant;
@@ -48,8 +49,8 @@ class DailyReportApiController extends Controller
             ];
         });
 
-        return response()->json([
-            'data' => $reports,
+        return ApiJson::ok([
+            'reports' => $reports->values()->all(),
             'employees' => $employees,
             'start_date' => $start->format('Y-m-d'),
             'end_date' => $end->format('Y-m-d'),
@@ -59,26 +60,24 @@ class DailyReportApiController extends Controller
     public function show(Request $request, DailyReport $daily_report)
     {
         if ($request->user()->id !== $daily_report->user_id && !$request->user()->hasRole('super-admin')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $daily_report->load('user');
         $canEdit = $request->user()->hasRole('super-admin') || $this->employeeCanEditReport($daily_report);
         $morningTasks = $daily_report->morningTasks()->map(fn ($t) => ['id' => $t->id, 'title' => $t->title, 'note' => $daily_report->getMorningTaskNote($t->id)])->values();
         $eveningTasks = $daily_report->eveningTasks()->map(fn ($t) => ['id' => $t->id, 'title' => $t->title, 'note' => $daily_report->getEveningTaskNote($t->id)])->values();
 
-        return response()->json([
-            'data' => [
-                'id' => $daily_report->id,
-                'user' => $daily_report->user ? ['id' => $daily_report->user->id, 'name' => $daily_report->user->name] : null,
-                'date' => $daily_report->date->format('Y-m-d'),
-                'morning_submitted_at' => $daily_report->morning_submitted_at?->toIso8601String(),
-                'evening_submitted_at' => $daily_report->evening_submitted_at?->toIso8601String(),
-                'morning_note' => $daily_report->morning_note,
-                'evening_note' => $daily_report->evening_note,
-                'morning_tasks' => $morningTasks,
-                'evening_tasks' => $eveningTasks,
-                'can_edit' => $canEdit,
-            ],
+        return ApiJson::ok([
+            'id' => $daily_report->id,
+            'user' => $daily_report->user ? ['id' => $daily_report->user->id, 'name' => $daily_report->user->name] : null,
+            'date' => $daily_report->date->format('Y-m-d'),
+            'morning_submitted_at' => $daily_report->morning_submitted_at?->toIso8601String(),
+            'evening_submitted_at' => $daily_report->evening_submitted_at?->toIso8601String(),
+            'morning_note' => $daily_report->morning_note,
+            'evening_note' => $daily_report->evening_note,
+            'morning_tasks' => $morningTasks,
+            'evening_tasks' => $eveningTasks,
+            'can_edit' => $canEdit,
         ]);
     }
 
@@ -87,7 +86,7 @@ class DailyReportApiController extends Controller
         $user = $request->user();
         $isSuperAdmin = $user->hasRole('super-admin');
         if (!$isSuperAdmin && !$user->can('create daily reports')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $ignoreTime = config('daily_reports.ignore_time_window', false);
 
@@ -107,7 +106,10 @@ class DailyReportApiController extends Controller
 
         $targetUserId = $isSuperAdmin ? (int) $request->user_id : $user->id;
         if ($isSuperAdmin && !User::find($targetUserId)?->hasRole('employee')) {
-            return response()->json(['message' => 'Selected user must be an employee.'], 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['user_id' => ['The selected user must be an employee.']],
+            ], 422);
         }
 
         $date = Carbon::parse($request->date);
@@ -118,15 +120,24 @@ class DailyReportApiController extends Controller
 
         if (!$isSuperAdmin && !$ignoreTime) {
             if ($slot === 'morning' && !$overrideMorning && !DailyReport::isWithinMorningWindow($now)) {
-                return response()->json(['message' => 'Morning report can only be submitted till 11:00 AM IST.'], 422);
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => ['slot' => ['Morning report can only be submitted till 11:00 AM IST.']],
+                ], 422);
             }
             if ($slot === 'evening') {
                 if (!$overrideEvening && !DailyReport::isWithinEveningWindow($now)) {
-                    return response()->json(['message' => 'Evening report can only be submitted till 5:15 PM IST.'], 422);
+                    return response()->json([
+                        'message' => 'Validation failed',
+                        'errors' => ['slot' => ['Evening report can only be submitted till 5:15 PM IST.']],
+                    ], 422);
                 }
                 $presentIds = AttendanceRecord::getPresentEmployeeIdsForDate($date);
                 if (!in_array($user->id, $presentIds)) {
-                    return response()->json(['message' => 'Evening report is only for days you are marked present.'], 422);
+                    return response()->json([
+                        'message' => 'Validation failed',
+                        'errors' => ['slot' => ['Evening report is only for days you are marked present.']],
+                    ], 422);
                 }
             }
         }
@@ -158,16 +169,19 @@ class DailyReportApiController extends Controller
         }
         $report->save();
 
-        return response()->json(['message' => 'Report submitted', 'data' => ['id' => $report->id]], 201);
+        return ApiJson::created(['id' => $report->id], 'Report submitted successfully');
     }
 
     public function update(Request $request, DailyReport $daily_report)
     {
         if ($request->user()->id !== $daily_report->user_id && !$request->user()->hasRole('super-admin')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
-        if (!$request->user()->hasRole('super-admin') && !$this->employeeCanEditReport($daily_report)) {
-            return response()->json(['message' => 'You can only edit within ' . config('daily_reports.employee_edit_days', 1) . ' day(s) of the report date.'], 403);
+        if (! $request->user()->hasRole('super-admin') && ! $this->employeeCanEditReport($daily_report)) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['report' => ['You can only edit within '.config('daily_reports.employee_edit_days', 1).' day(s) of the report date.']],
+            ], 422);
         }
 
         $request->validate([
@@ -190,7 +204,10 @@ class DailyReportApiController extends Controller
 
         if ($request->has('morning_note') || $request->has('morning_task_ids')) {
             if (!$isSuperAdmin && !$ignoreTime && !$hasEditGrant && !$overrideMorning && !DailyReport::isWithinMorningWindow($now)) {
-                return response()->json(['message' => 'Morning report can only be edited till 11:00 AM IST.'], 422);
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => ['morning_note' => ['Morning report can only be edited till 11:00 AM IST.']],
+                ], 422);
             }
             $daily_report->morning_note = $request->morning_note;
             $daily_report->morning_task_ids = array_values(array_map('intval', $request->morning_task_ids ?? []));
@@ -205,7 +222,10 @@ class DailyReportApiController extends Controller
         }
         if ($request->has('evening_note') || $request->has('evening_task_ids')) {
             if (!$isSuperAdmin && !$ignoreTime && !$hasEditGrant && !$overrideEvening && !DailyReport::isWithinEveningWindow($now)) {
-                return response()->json(['message' => 'Evening report can only be edited till 5:15 PM IST.'], 422);
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => ['evening_note' => ['Evening report can only be edited till 5:15 PM IST.']],
+                ], 422);
             }
             $daily_report->evening_note = $request->evening_note;
             $daily_report->evening_task_ids = array_values(array_map('intval', $request->evening_task_ids ?? []));
@@ -220,16 +240,17 @@ class DailyReportApiController extends Controller
         }
         $daily_report->save();
 
-        return response()->json(['message' => 'Updated', 'data' => ['id' => $daily_report->id]]);
+        return ApiJson::ok(['id' => $daily_report->id], 'Updated');
     }
 
     public function destroy(Request $request, DailyReport $daily_report)
     {
         if (!$request->user()->hasRole('super-admin')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return ApiJson::unauthorized();
         }
         $daily_report->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function createContext(Request $request)
@@ -243,7 +264,7 @@ class DailyReportApiController extends Controller
         $assignedTasks = Task::where('assigned_to', $targetUser->id)->where('is_active', true)->orderBy('title')->get(['id', 'title']);
         $report = DailyReport::firstOrNew(['user_id' => $targetUser->id, 'date' => $date->format('Y-m-d')]);
         $now = now()->setTimezone('Asia/Kolkata');
-        return response()->json([
+        return ApiJson::ok([
             'employees' => $employees,
             'target_user_id' => $targetUser->id,
             'date' => $date->format('Y-m-d'),

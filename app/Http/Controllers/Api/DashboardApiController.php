@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\AttendanceRecord;
 use App\Models\DailyReport;
 use App\Models\Finance;
@@ -63,7 +64,7 @@ class DashboardApiController extends Controller
             $eveningReportMissing = User::whereIn('id', $missingIds)->orderBy('name')->get(['id', 'name', 'email']);
         }
 
-        return response()->json([
+        return ApiJson::ok([
             'total_spending' => $totalSpending,
             'total_received' => $totalReceived,
             'net_balance' => $netBalance,

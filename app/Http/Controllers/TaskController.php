@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskReport;
 use App\Models\User;
@@ -122,12 +123,20 @@ class TaskController extends Controller implements HasMiddleware
             $defaultDate = Carbon::today()->format('Y-m-d');
         }
 
-        return view('tasks.create', compact('employees', 'defaultPriority', 'defaultFreq', 'defaultDate')); 
+        $projects = Project::active()->with('client')->orderBy('name')->get();
+
+        return view('tasks.create', compact('employees', 'defaultPriority', 'defaultFreq', 'defaultDate', 'projects')); 
     }
     
     public function store(Request $request) {
-        $request->validate(['title' => 'required', 'category' => 'required', 'media' => 'nullable|file|max:2048']);
+        $request->validate([
+            'title' => 'required',
+            'category' => 'required',
+            'media' => 'nullable|file|max:2048',
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
         $data = $request->except('media'); 
+        $data['project_id'] = $request->filled('project_id') ? (int) $request->project_id : null;
         $data['created_by'] = auth()->id();
         $data['priority'] = $request->priority ?? 'normal';
         $data['frequency'] = $request->frequency ?? 'daily';
@@ -160,12 +169,18 @@ class TaskController extends Controller implements HasMiddleware
 
     public function edit(Task $task) {
         $employees = User::role('employee')->where('is_active', true)->get();
-        return view('tasks.edit', compact('task', 'employees'));
+        $projects = Project::active()->with('client')->orderBy('name')->get();
+        return view('tasks.edit', compact('task', 'employees', 'projects'));
     }
 
     public function update(Request $request, Task $task) {
-        $request->validate(['title' => 'required', 'media' => 'nullable|file|max:2048']);
+        $request->validate([
+            'title' => 'required',
+            'media' => 'nullable|file|max:2048',
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
         $data = $request->except('media'); 
+        $data['project_id'] = $request->filled('project_id') ? (int) $request->project_id : null;
 
         if ($request->hasFile('media')) {
             if($task->media_path) Storage::disk('public')->delete($task->media_path);

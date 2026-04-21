@@ -15,12 +15,26 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DailyReportController;
+use App\Http\Controllers\LeadController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\FinanceDashboardController;
+use App\Http\Controllers\RevenueTargetController;
+use App\Http\Controllers\VentureController;
+use App\Http\Controllers\DailyFocusController;
 
 Route::get('/', function () { return redirect()->route('login'); });
 
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::get('/my-day/history', [DailyFocusController::class, 'history'])->name('daily-focus.history');
+        Route::get('/my-day', [DailyFocusController::class, 'today'])->name('daily-focus.today');
+        Route::match(['put', 'patch'], '/my-day/{dailyFocus}', [DailyFocusController::class, 'update'])->name('daily-focus.update');
+    });
 
     // Profile Management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -38,8 +52,16 @@ Route::middleware(['auth'])->group(function () {
     // Finance
     Route::patch('/finance-contacts/{financeContact}/toggle', [FinanceContactController::class, 'toggleStatus'])->name('finance-contacts.toggle');
     Route::resource('finance-contacts', FinanceContactController::class);
+    Route::get('/finance/dashboard', [FinanceDashboardController::class, 'index'])->name('finance.dashboard');
+    Route::get('/finance/pnl', [FinanceDashboardController::class, 'pnl'])->name('finance.pnl');
     Route::patch('/finance/{finance}/toggle', [FinanceController::class, 'toggleStatus'])->name('finance.toggle');
     Route::resource('finance', FinanceController::class);
+    Route::resource('revenue-targets', RevenueTargetController::class)->except(['show']);
+
+    // Ventures
+    Route::get('/ventures', [VentureController::class, 'index'])->name('ventures.index');
+    Route::get('/ventures/{venture:slug}', [VentureController::class, 'show'])->name('ventures.show');
+    Route::post('/ventures/{venture:slug}/updates', [VentureController::class, 'addUpdate'])->name('ventures.updates.store');
 
     // Reports (Grocery Specific)
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
@@ -62,6 +84,24 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/tasks/todos/{todo}', [TaskTodoController::class, 'destroy'])->name('tasks.todos.destroy');
 
     Route::resource('tasks', TaskController::class);
+
+    // CRM / Leads
+    Route::get('/leads/pipeline', [LeadController::class, 'pipeline'])->name('leads.pipeline');
+    Route::get('/leads/overdue', [LeadController::class, 'overdue'])->name('leads.overdue');
+    Route::patch('/leads/{lead}/stage', [LeadController::class, 'updateStage'])->name('leads.stage');
+    Route::post('/leads/{lead}/activity', [LeadController::class, 'addActivity'])->name('leads.activity');
+    Route::patch('/leads/{lead}/activities/{activity}', [LeadController::class, 'updateActivity'])->name('leads.activities.update');
+    Route::delete('/leads/{lead}/activities/{activity}', [LeadController::class, 'destroyActivity'])->name('leads.activities.destroy');
+    Route::resource('leads', LeadController::class);
+
+    // Clients & Projects
+    Route::resource('clients', ClientController::class);
+    Route::post('/projects/{project}/milestones', [ProjectController::class, 'addMilestone'])->name('projects.milestones.store');
+    Route::post('/projects/{project}/milestones/reorder', [ProjectController::class, 'reorderMilestones'])->name('projects.milestones.reorder');
+    Route::patch('/milestones/{milestone}/complete', [ProjectController::class, 'completeMilestone'])->name('milestones.complete');
+    Route::resource('projects', ProjectController::class);
+    Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
+    Route::resource('invoices', InvoiceController::class);
 
     // Grocery Expenses
     Route::resource('grocery-expenses', GroceryExpenseController::class)->except(['index', 'create', 'show']);

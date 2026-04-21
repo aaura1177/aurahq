@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -12,7 +13,8 @@ class ProfileApiController extends Controller
     public function show(Request $request)
     {
         $user = $request->user();
-        return response()->json([
+
+        return ApiJson::ok([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -31,7 +33,12 @@ class ProfileApiController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
-        return response()->json(['message' => 'Profile updated', 'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email]]);
+
+        return ApiJson::ok([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ], 'Profile updated');
     }
 
     public function updatePassword(Request $request)
@@ -40,10 +47,14 @@ class ProfileApiController extends Controller
             'current_password' => 'required',
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
-        if (!Hash::check($request->current_password, $request->user()->password)) {
-            return response()->json(['message' => 'Current password is incorrect'], 422);
+        if (! Hash::check($request->current_password, $request->user()->password)) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['current_password' => ['Current password is incorrect.']],
+            ], 422);
         }
         $request->user()->update(['password' => $request->password]);
-        return response()->json(['message' => 'Password updated']);
+
+        return ApiJson::ok([], 'Password updated');
     }
 }

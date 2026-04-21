@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\ApiJson;
 use App\Models\GroceryDailyTemplate;
 use App\Models\GroceryListItem;
 use Carbon\Carbon;
@@ -51,9 +52,10 @@ class GroceryApiController extends Controller
             $query->where('is_active', true);
         }
 
-        $items = $query->latest()->get()->unique(fn ($item) => ($item->item_name . $item->type . ($item->date ? $item->date->format('Y-m-d') : '')));
-        return response()->json([
-            'data' => $items->values()->map(fn ($i) => $this->itemJson($i)),
+        $items = $query->latest()->get()->unique(fn ($item) => ($item->item_name.$item->type.($item->date ? $item->date->format('Y-m-d') : '')));
+
+        return ApiJson::ok([
+            'items' => $items->values()->map(fn ($i) => $this->itemJson($i))->values()->all(),
             'week' => $week,
             'type' => $type,
             'total_estimated' => $items->sum('estimated_price'),
@@ -69,32 +71,33 @@ class GroceryApiController extends Controller
             $data['date'] = Carbon::today();
         }
         $item = GroceryListItem::create($data);
-        return response()->json(['message' => 'Created', 'data' => $this->itemJson($item)], 201);
+        return ApiJson::created($this->itemJson($item), 'Grocery item created successfully');
     }
 
     public function show(GroceryListItem $grocery)
     {
-        return response()->json(['data' => $this->itemJson($grocery)]);
+        return ApiJson::ok($this->itemJson($grocery));
     }
 
     public function update(Request $request, GroceryListItem $grocery)
     {
         $request->validate(['item_name' => 'required', 'qty' => 'required', 'type' => 'required', 'estimated_price' => 'nullable|numeric', 'remark' => 'nullable']);
         $grocery->update($request->only('item_name', 'qty', 'type', 'estimated_price', 'remark'));
-        return response()->json(['message' => 'Updated', 'data' => $this->itemJson($grocery)]);
+        return ApiJson::ok($this->itemJson($grocery), 'Updated');
     }
 
     public function destroy(GroceryListItem $grocery)
     {
         $grocery->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     public function toggle(GroceryListItem $grocery)
     {
         $grocery->is_active = !$grocery->is_active;
         $grocery->save();
-        return response()->json(['data' => ['is_active' => $grocery->is_active]]);
+        return ApiJson::ok(['is_active' => $grocery->is_active], 'Updated');
     }
 
     public function markPurchased(Request $request, GroceryListItem $grocery)
@@ -103,7 +106,7 @@ class GroceryApiController extends Controller
         $grocery->status = 'purchased';
         $grocery->actual_cost = $request->actual_cost;
         $grocery->save();
-        return response()->json(['message' => 'OK', 'data' => $this->itemJson($grocery)]);
+        return ApiJson::ok($this->itemJson($grocery), 'Updated');
     }
 
     public function markPending(GroceryListItem $grocery)
@@ -111,41 +114,42 @@ class GroceryApiController extends Controller
         $grocery->status = 'pending';
         $grocery->actual_cost = null;
         $grocery->save();
-        return response()->json(['message' => 'OK', 'data' => $this->itemJson($grocery)]);
+        return ApiJson::ok($this->itemJson($grocery), 'Updated');
     }
 
     public function variableExpense(Request $request)
     {
         $request->validate(['amount' => 'required|numeric', 'remark' => 'required|string', 'date' => 'required|date']);
         $e = \App\Models\GroceryExpense::create($request->only('amount', 'remark', 'date'));
-        return response()->json(['message' => 'Created', 'data' => ['id' => $e->id]], 201);
+        return ApiJson::created(['id' => $e->id], 'Variable expense recorded successfully');
     }
 
     public function templates(Request $request)
     {
         $type = $request->query('type', 'vegetables');
         $tpls = GroceryDailyTemplate::where('type', $type)->get();
-        return response()->json(['data' => $tpls->map(fn ($t) => ['id' => $t->id, 'item_name' => $t->item_name, 'qty' => $t->qty, 'estimated_price' => $t->estimated_price, 'type' => $t->type])]);
+        return ApiJson::ok($tpls->map(fn ($t) => ['id' => $t->id, 'item_name' => $t->item_name, 'qty' => $t->qty, 'estimated_price' => $t->estimated_price, 'type' => $t->type])->values()->all());
     }
 
     public function storeTemplate(Request $request)
     {
         $request->validate(['item_name' => 'required', 'qty' => 'required', 'type' => 'required', 'estimated_price' => 'nullable|numeric']);
         $t = GroceryDailyTemplate::create($request->only('item_name', 'qty', 'type', 'estimated_price'));
-        return response()->json(['message' => 'Created', 'data' => ['id' => $t->id]], 201);
+        return ApiJson::created(['id' => $t->id], 'Template created successfully');
     }
 
     public function updateTemplate(Request $request, GroceryDailyTemplate $template)
     {
         $request->validate(['item_name' => 'required', 'qty' => 'required', 'estimated_price' => 'nullable|numeric']);
         $template->update($request->only('item_name', 'qty', 'estimated_price'));
-        return response()->json(['message' => 'Updated']);
+        return ApiJson::ok(['id' => $template->id], 'Updated');
     }
 
     public function destroyTemplate(GroceryDailyTemplate $template)
     {
         $template->delete();
-        return response()->json(['message' => 'Deleted']);
+
+        return ApiJson::noContent();
     }
 
     private function itemJson(GroceryListItem $i): array

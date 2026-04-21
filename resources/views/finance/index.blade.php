@@ -4,11 +4,14 @@
 
 @section('content')
 <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-    <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+    <div class="p-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3">
         <h3 class="font-bold text-slate-700">Recent Transactions</h3>
-        @can('create finance')
-        <a href="{{ route('finance.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">+ Add Transaction</a>
-        @endcan
+        <div class="flex flex-wrap gap-2 items-center">
+            <a href="{{ route('finance.dashboard') }}" class="text-sm font-semibold text-emerald-700 hover:underline">Monthly P&amp;L →</a>
+            @can('create finance')
+            <a href="{{ route('finance.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">+ Add Transaction</a>
+            @endcan
+        </div>
     </div>
     <table class="w-full text-sm text-left">
         <thead class="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">

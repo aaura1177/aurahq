@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ReportEditGrant;
 use App\Models\ReportSubmissionOverride;
 use App\Models\User;
+use App\Support\ApiJson;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,8 @@ class DailyReportManageApiController extends Controller
             'date' => $g->date->format('Y-m-d'),
             'expires_at' => $g->expires_at->toIso8601String(),
         ]);
-        return response()->json([
+
+        return ApiJson::ok([
             'employees' => $employees,
             'submission_overrides' => $submissionOverrides,
             'edit_grants' => $editGrants,
@@ -38,8 +40,11 @@ class DailyReportManageApiController extends Controller
     {
         $request->validate(['user_id' => 'required|exists:users,id', 'date' => 'required|date', 'slot' => 'required|in:morning,evening']);
         $userId = (int) $request->user_id;
-        if (!User::find($userId)?->hasRole('employee')) {
-            return response()->json(['message' => 'User must be an employee'], 422);
+        if (! User::find($userId)?->hasRole('employee')) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['user_id' => ['User must be an employee.']],
+            ], 422);
         }
         $dateStr = Carbon::parse($request->date)->format('Y-m-d');
         $override = ReportSubmissionOverride::firstOrNew(
@@ -52,15 +57,18 @@ class DailyReportManageApiController extends Controller
             $override->allow_evening = true;
         }
         $override->save();
-        return response()->json(['message' => 'OK']);
+
+        return ApiJson::ok(['user_id' => $userId, 'date' => $dateStr], 'Submission window updated');
     }
 
     public function revokeSubmissionOverride(Request $request)
     {
         $request->validate(['user_id' => 'required|exists:users,id', 'date' => 'required|date', 'slot' => 'required|in:morning,evening']);
         $override = ReportSubmissionOverride::where('user_id', $request->user_id)->where('date', $request->date)->first();
-        if (!$override) {
-            return response()->json(['message' => 'Not found'], 404);
+        if (! $override) {
+            return response()->json([
+                'message' => 'Not found',
+            ], 404);
         }
         if ($request->slot === 'morning') {
             $override->allow_morning = false;
@@ -68,18 +76,22 @@ class DailyReportManageApiController extends Controller
             $override->allow_evening = false;
         }
         $override->save();
-        if (!$override->allow_morning && !$override->allow_evening) {
+        if (! $override->allow_morning && ! $override->allow_evening) {
             $override->delete();
         }
-        return response()->json(['message' => 'Revoked']);
+
+        return ApiJson::ok([], 'Revoked');
     }
 
     public function grantEdit(Request $request)
     {
         $request->validate(['user_id' => 'required|exists:users,id', 'date' => 'required|date', 'duration_minutes' => 'required|integer|min:1|max:10080']);
         $userId = (int) $request->user_id;
-        if (!User::find($userId)?->hasRole('employee')) {
-            return response()->json(['message' => 'User must be an employee'], 422);
+        if (! User::find($userId)?->hasRole('employee')) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => ['user_id' => ['User must be an employee.']],
+            ], 422);
         }
         $dateStr = Carbon::parse($request->date)->format('Y-m-d');
         $expiresAt = now()->addMinutes((int) $request->duration_minutes);
@@ -96,13 +108,15 @@ class DailyReportManageApiController extends Controller
                 'granted_by' => $request->user()->id,
             ]);
         }
-        return response()->json(['message' => 'OK']);
+
+        return ApiJson::ok(['user_id' => $userId, 'date' => $dateStr], 'Edit access granted');
     }
 
     public function revokeEditGrant(Request $request)
     {
         $request->validate(['user_id' => 'required|exists:users,id', 'date' => 'required|date']);
         ReportEditGrant::where('user_id', $request->user_id)->where('date', $request->date)->delete();
-        return response()->json(['message' => 'Revoked']);
+
+        return ApiJson::ok([], 'Revoked');
     }
 }

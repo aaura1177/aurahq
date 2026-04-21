@@ -24,4 +24,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(DailyReport::class);
     }
+
+    public function dailyFocuses()
+    {
+        return $this->hasMany(DailyFocus::class);
+    }
 }

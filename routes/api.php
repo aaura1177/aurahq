@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\ApiJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
@@ -19,13 +20,22 @@ use App\Http\Controllers\Api\HolidayApiController;
 use App\Http\Controllers\Api\AttendanceApiController;
 use App\Http\Controllers\Api\DailyReportApiController;
 use App\Http\Controllers\Api\DailyReportManageApiController;
+use App\Http\Controllers\Api\LeadApiController;
+use App\Http\Controllers\Api\ClientApiController;
+use App\Http\Controllers\Api\ProjectApiController;
+use App\Http\Controllers\Api\InvoiceApiController;
+use App\Http\Controllers\Api\FinanceDashboardApiController;
+use App\Http\Controllers\Api\RevenueTargetApiController;
+use App\Http\Controllers\Api\VentureApiController;
+use App\Http\Controllers\Api\DailyFocusApiController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         $user = $request->user();
-        return response()->json([
+
+        return ApiJson::ok([
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -73,6 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['permission:delete finance contacts'])->delete('finance-contacts/{financeContact}', [FinanceContactApiController::class, 'destroy']);
 
     Route::middleware(['permission:view finance'])->group(function () {
+        Route::get('finance/dashboard', [FinanceDashboardApiController::class, 'index']);
+        Route::get('finance/pnl', [FinanceDashboardApiController::class, 'pnl']);
         Route::get('finance', [FinanceApiController::class, 'index']);
         Route::get('finance/{finance}', [FinanceApiController::class, 'show']);
     });
@@ -82,6 +94,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('finance/{finance}/toggle', [FinanceApiController::class, 'toggle']);
     });
     Route::middleware(['permission:delete finance'])->delete('finance/{finance}', [FinanceApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view revenue targets'])->get('revenue-targets', [RevenueTargetApiController::class, 'index']);
+    Route::middleware(['permission:create revenue targets'])->post('revenue-targets', [RevenueTargetApiController::class, 'store']);
+    Route::middleware(['permission:edit revenue targets'])->put('revenue-targets/{revenueTarget}', [RevenueTargetApiController::class, 'update']);
+    Route::middleware(['permission:delete revenue targets'])->delete('revenue-targets/{revenueTarget}', [RevenueTargetApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view ventures'])->group(function () {
+        Route::get('ventures', [VentureApiController::class, 'index']);
+        Route::get('ventures/{venture:slug}', [VentureApiController::class, 'show']);
+    });
+    Route::middleware(['permission:create venture updates'])->post('ventures/{venture:slug}/updates', [VentureApiController::class, 'addUpdate']);
 
     Route::middleware(['permission:view tasks'])->group(function () {
         Route::get('tasks/personal', [TaskApiController::class, 'personal']);
@@ -95,6 +118,53 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('tasks/{task}/review', [TaskApiController::class, 'reviewTask']);
     });
     Route::middleware(['permission:delete tasks'])->delete('tasks/{task}', [TaskApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view leads'])->group(function () {
+        Route::get('leads', [LeadApiController::class, 'index']);
+        Route::get('leads/pipeline', [LeadApiController::class, 'pipeline']);
+        Route::get('leads/overdue', [LeadApiController::class, 'overdue']);
+        Route::get('leads/{lead}', [LeadApiController::class, 'show']);
+    });
+    Route::middleware(['permission:create leads'])->post('leads', [LeadApiController::class, 'store']);
+    Route::middleware(['permission:edit leads'])->group(function () {
+        Route::put('leads/{lead}', [LeadApiController::class, 'update']);
+        Route::patch('leads/{lead}/stage', [LeadApiController::class, 'updateStage']);
+        Route::post('leads/{lead}/activity', [LeadApiController::class, 'addActivity']);
+    });
+    Route::middleware(['permission:edit lead activities'])->patch('leads/{lead}/activities/{activity}', [LeadApiController::class, 'updateActivity']);
+    Route::middleware(['permission:delete lead activities'])->delete('leads/{lead}/activities/{activity}', [LeadApiController::class, 'destroyActivity']);
+    Route::middleware(['permission:delete leads'])->delete('leads/{lead}', [LeadApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view clients'])->group(function () {
+        Route::get('clients', [ClientApiController::class, 'index']);
+        Route::get('clients/{client}', [ClientApiController::class, 'show']);
+    });
+    Route::middleware(['permission:create clients'])->post('clients', [ClientApiController::class, 'store']);
+    Route::middleware(['permission:edit clients'])->put('clients/{client}', [ClientApiController::class, 'update']);
+    Route::middleware(['permission:delete clients'])->delete('clients/{client}', [ClientApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view projects'])->group(function () {
+        Route::get('projects', [ProjectApiController::class, 'index']);
+        Route::get('projects/{project}', [ProjectApiController::class, 'show']);
+    });
+    Route::middleware(['permission:create projects'])->post('projects', [ProjectApiController::class, 'store']);
+    Route::middleware(['permission:edit projects'])->group(function () {
+        Route::put('projects/{project}', [ProjectApiController::class, 'update']);
+        Route::post('projects/{project}/milestones', [ProjectApiController::class, 'addMilestone']);
+        Route::patch('milestones/{milestone}/complete', [ProjectApiController::class, 'completeMilestone']);
+    });
+    Route::middleware(['permission:delete projects'])->delete('projects/{project}', [ProjectApiController::class, 'destroy']);
+
+    Route::middleware(['permission:view invoices'])->group(function () {
+        Route::get('invoices', [InvoiceApiController::class, 'index']);
+        Route::get('invoices/{invoice}', [InvoiceApiController::class, 'show']);
+    });
+    Route::middleware(['permission:create invoices'])->post('invoices', [InvoiceApiController::class, 'store']);
+    Route::middleware(['permission:edit invoices'])->group(function () {
+        Route::put('invoices/{invoice}', [InvoiceApiController::class, 'update']);
+        Route::patch('invoices/{invoice}/status', [InvoiceApiController::class, 'updateStatus']);
+    });
+    Route::middleware(['permission:delete invoices'])->delete('invoices/{invoice}', [InvoiceApiController::class, 'destroy']);
 
     Route::middleware(['permission:create task reports'])->post('tasks/{task}/reports', [TaskApiController::class, 'storeReport']);
     Route::middleware(['permission:edit task reports'])->put('task-reports/{report}', [TaskApiController::class, 'updateReport']);
@@ -163,4 +233,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('daily-reports/{daily_report}', [DailyReportApiController::class, 'show']);
     Route::put('daily-reports/{daily_report}', [DailyReportApiController::class, 'update']);
     Route::middleware('role:super-admin')->delete('daily-reports/{daily_report}', [DailyReportApiController::class, 'destroy']);
+
+    Route::middleware('role:super-admin')->group(function () {
+        Route::get('daily-focus/history', [DailyFocusApiController::class, 'history']);
+        Route::get('daily-focus', [DailyFocusApiController::class, 'today']);
+        Route::post('daily-focus', [DailyFocusApiController::class, 'store']);
+        Route::match(['put', 'patch'], 'daily-focus/{dailyFocus}', [DailyFocusApiController::class, 'update']);
+    });
 });

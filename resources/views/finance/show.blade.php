@@ -27,6 +27,20 @@
             <p class="text-sm text-slate-500 font-bold uppercase mb-1">Payment Method</p>
             <p class="text-lg capitalize">{{ $finance->method }}</p>
         </div>
+        <div>
+            <p class="text-sm text-slate-500 font-bold uppercase mb-1">Category</p>
+            <p class="text-lg">{{ \App\Models\Finance::categoryLabel($finance->category, $finance->type) }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-500 font-bold uppercase mb-1">Venture</p>
+            <p class="text-lg">{{ \App\Models\Finance::ventureLabel($finance->venture ?? 'aurateria') }}</p>
+        </div>
+        @if($finance->is_recurring)
+        <div>
+            <p class="text-sm text-slate-500 font-bold uppercase mb-1">Recurring</p>
+            <p class="text-lg">Day {{ $finance->recurring_day ?? '—' }} of each month</p>
+        </div>
+        @endif
         <div class="col-span-2">
             <p class="text-sm text-slate-500 font-bold uppercase mb-1">Remark</p>
             <p class="text-slate-700 bg-slate-50 p-3 rounded">{{ $finance->remark ?? 'No remarks provided.' }}</p>
