@@ -240,4 +240,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('daily-focus', [DailyFocusApiController::class, 'store']);
         Route::match(['put', 'patch'], 'daily-focus/{dailyFocus}', [DailyFocusApiController::class, 'update']);
     });
+
+    Route::middleware('role:super-admin')->get('morning-brief', [\App\Http\Controllers\Api\MorningBriefApiController::class, 'index']);
 });
