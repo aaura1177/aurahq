@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Task;
-use App\Models\GroceryListItem;
-use Carbon\Carbon;
 
 class AiController extends Controller
 {
@@ -38,19 +36,6 @@ class AiController extends Controller
                                 'category' => ['type' => 'string', 'enum' => ['admin_personal', 'employee_assignment']],
                             ],
                             'required' => ['title'],
-                        ],
-                    ],
-                    [
-                        'name' => 'add_grocery',
-                        'description' => 'Add item to grocery list',
-                        'parameters' => [
-                            'type' => 'object',
-                            'properties' => [
-                                'item_name' => ['type' => 'string'],
-                                'type' => ['type' => 'string', 'enum' => ['vegetables', 'blinkit', 'supermart', 'today']],
-                                'qty' => ['type' => 'string'],
-                            ],
-                            'required' => ['item_name'],
                         ],
                     ],
                 ],
@@ -93,20 +78,6 @@ class AiController extends Controller
                         'is_active' => true,
                     ]);
                     $results[] = "Task '{$args['title']}' created successfully.";
-                }
-
-                if ($fnName === 'add_grocery') {
-                    $type = $args['type'] ?? 'today';
-                    $date = ($type === 'today') ? Carbon::today() : null;
-                    GroceryListItem::create([
-                        'item_name' => $args['item_name'],
-                        'type' => $type,
-                        'qty' => $args['qty'] ?? '1',
-                        'status' => 'pending',
-                        'is_active' => true,
-                        'date' => $date,
-                    ]);
-                    $results[] = "Added {$args['item_name']} to grocery list.";
                 }
             }
 

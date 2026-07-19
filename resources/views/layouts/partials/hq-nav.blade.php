@@ -71,7 +71,7 @@
     @endif
 
     {{-- MANAGE — quieter secondary zone --}}
-    @if(auth()->user()->hasRole('super-admin') || auth()->user()->can('create daily reports') || auth()->user()->can('view grocery'))
+    @if(auth()->user()->hasRole('super-admin') || auth()->user()->can('create daily reports'))
     <li class="pt-5 pb-1 px-3 text-[10px] font-bold text-slate-600 uppercase tracking-wider">Manage</li>
 
     @if(auth()->user()->hasRole('super-admin') || auth()->user()->can('create daily reports'))
@@ -104,17 +104,6 @@
         </a>
     </li>
     @endrole
-
-    @can('view grocery')
-    <li>
-        <a href="{{ route('grocery.index') }}"
-           class="group flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition
-                  {{ request()->routeIs('grocery.*') || request()->routeIs('finance-contacts.*') ? 'bg-navy-800 text-white' : 'text-slate-400 hover:bg-navy-800/50 hover:text-slate-200' }}">
-            <i class="fas fa-shopping-basket w-5 text-center {{ request()->routeIs('grocery.*') || request()->routeIs('finance-contacts.*') ? 'text-brand-400' : 'text-slate-600 group-hover:text-brand-400' }}"></i>
-            Personal
-        </a>
-    </li>
-    @endcan
     @endif
 
 </ul>

@@ -13,8 +13,6 @@ use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\FinanceContactApiController;
 use App\Http\Controllers\Api\FinanceApiController;
 use App\Http\Controllers\Api\TaskApiController;
-use App\Http\Controllers\Api\GroceryApiController;
-use App\Http\Controllers\Api\GroceryExpenseApiController;
 use App\Http\Controllers\Api\ReportApiController;
 use App\Http\Controllers\Api\HolidayApiController;
 use App\Http\Controllers\Api\AttendanceApiController;
@@ -177,34 +175,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::middleware(['permission:delete task todos'])->delete('task-todos/{todo}', [TaskApiController::class, 'destroyTodo']);
 
-    Route::middleware(['permission:view grocery'])->group(function () {
-        Route::get('grocery', [GroceryApiController::class, 'index']);
-        Route::get('grocery/{grocery}', [GroceryApiController::class, 'show']);
-    });
-    Route::middleware(['permission:create grocery'])->group(function () {
-        Route::post('grocery', [GroceryApiController::class, 'store']);
-        Route::post('grocery/variable-expense', [GroceryApiController::class, 'variableExpense']);
-        Route::get('grocery-templates', [GroceryApiController::class, 'templates']);
-        Route::post('grocery-templates', [GroceryApiController::class, 'storeTemplate']);
-    });
-    Route::middleware(['permission:edit grocery'])->group(function () {
-        Route::put('grocery/{grocery}', [GroceryApiController::class, 'update']);
-        Route::patch('grocery/{grocery}/toggle', [GroceryApiController::class, 'toggle']);
-        Route::post('grocery/{grocery}/purchase', [GroceryApiController::class, 'markPurchased']);
-        Route::post('grocery/{grocery}/pending', [GroceryApiController::class, 'markPending']);
-        Route::put('grocery-templates/{template}', [GroceryApiController::class, 'updateTemplate']);
-    });
-    Route::middleware(['permission:delete grocery'])->delete('grocery/{grocery}', [GroceryApiController::class, 'destroy']);
-    Route::middleware(['permission:delete grocery templates'])->delete('grocery-templates/{template}', [GroceryApiController::class, 'destroyTemplate']);
-
-    Route::middleware(['permission:view grocery expenses'])->get('grocery-expenses', [GroceryExpenseApiController::class, 'index']);
-    Route::middleware(['permission:create grocery expenses'])->post('grocery-expenses', [GroceryExpenseApiController::class, 'store']);
-    Route::middleware(['permission:edit grocery expenses'])->group(function () {
-        Route::put('grocery-expenses/{groceryExpense}', [GroceryExpenseApiController::class, 'update']);
-    });
-    Route::middleware(['permission:delete grocery expenses'])->delete('grocery-expenses/{groceryExpense}', [GroceryExpenseApiController::class, 'destroy']);
-
-    Route::middleware(['permission:view reports'])->get('reports/grocery', [ReportApiController::class, 'index']);
+    Route::middleware(['permission:view reports'])->get('reports', [ReportApiController::class, 'index']);
 
     Route::middleware('role:super-admin')->group(function () {
         Route::apiResource('holidays', HolidayApiController::class)->names([

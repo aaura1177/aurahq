@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Permissions
-        $modules = ['users', 'roles', 'finance', 'finance contacts', 'revenue targets', 'tasks', 'grocery', 'grocery templates', 'grocery expenses', 'reports', 'task reports', 'task todos', 'holidays', 'attendance', 'daily reports', 'leads', 'lead activities', 'clients', 'projects', 'milestones', 'invoices', 'ventures', 'venture updates'];
+        $modules = ['users', 'roles', 'finance', 'finance contacts', 'revenue targets', 'tasks', 'reports', 'task reports', 'task todos', 'holidays', 'attendance', 'daily reports', 'leads', 'lead activities', 'clients', 'projects', 'milestones', 'invoices', 'ventures', 'venture updates'];
         $actions = ['view', 'create', 'edit', 'delete'];
         foreach ($modules as $module) {
             foreach ($actions as $action) {

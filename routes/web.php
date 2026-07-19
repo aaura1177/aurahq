@@ -5,8 +5,6 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\FinanceContactController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskTodoController;
-use App\Http\Controllers\GroceryController;
-use App\Http\Controllers\GroceryExpenseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
@@ -86,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ventures/{venture:slug}', [VentureController::class, 'show'])->name('ventures.show');
     Route::post('/ventures/{venture:slug}/updates', [VentureController::class, 'addUpdate'])->name('ventures.updates.store');
 
-    // Reports (Grocery Specific)
+    // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     // Tasks (Advanced)
@@ -127,23 +125,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::patch('/invoices/{invoice}/status', [InvoiceController::class, 'updateStatus'])->name('invoices.status');
     Route::resource('invoices', InvoiceController::class);
-
-    // Grocery Expenses
-    Route::resource('grocery-expenses', GroceryExpenseController::class)->except(['index', 'create', 'show']);
-
-    // Grocery
-    Route::get('/grocery/templates', [GroceryController::class, 'templates'])->name('grocery.templates');
-    Route::get('/grocery/templates/{template}/edit', [GroceryController::class, 'editTemplate'])->name('grocery.templates.edit');
-    Route::post('/grocery/templates', [GroceryController::class, 'storeTemplate'])->name('grocery.templates.store');
-    Route::put('/grocery/templates/{template}', [GroceryController::class, 'updateTemplate'])->name('grocery.templates.update');
-    Route::delete('/grocery/templates/{template}', [GroceryController::class, 'destroyTemplate'])->name('grocery.templates.destroy');
-    
-    Route::post('/grocery/variable', [GroceryController::class, 'storeVariableExpense'])->name('grocery.variable');
-    Route::post('/grocery/{grocery}/purchase', [GroceryController::class, 'markPurchased'])->name('grocery.purchase');
-    Route::post('/grocery/{grocery}/pending', [GroceryController::class, 'markPending'])->name('grocery.pending');
-    
-    Route::patch('/grocery/{grocery}/toggle', [GroceryController::class, 'toggleStatus'])->name('grocery.toggle');
-    Route::resource('grocery', GroceryController::class);
 
     // Holidays
     Route::resource('holidays', HolidayController::class);

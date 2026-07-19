@@ -7,7 +7,6 @@ use App\Support\ApiJson;
 use App\Models\AttendanceRecord;
 use App\Models\DailyReport;
 use App\Models\Finance;
-use App\Models\GroceryListItem;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -22,7 +21,6 @@ class DashboardApiController extends Controller
         $netBalance = $totalReceived - $totalSpending;
         $pendingTasks = Task::where('status', 'pending')->where('is_active', true)->count();
         $activeUsers = User::where('is_active', true)->count();
-        $groceryDue = GroceryListItem::where('status', 'pending')->where('is_active', true)->count();
 
         $chartLabels = [];
         $expenseData = [];
@@ -70,7 +68,6 @@ class DashboardApiController extends Controller
             'net_balance' => $netBalance,
             'pending_tasks' => $pendingTasks,
             'active_users' => $activeUsers,
-            'grocery_due' => $groceryDue,
             'chart' => ['labels' => $chartLabels, 'expense' => $expenseData, 'income' => $incomeData],
             'recent_transactions' => $recentTransactions,
             'morning_report_missing' => $morningReportMissing,
