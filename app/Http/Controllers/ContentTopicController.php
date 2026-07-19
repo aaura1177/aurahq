@@ -41,6 +41,21 @@ class ContentTopicController extends Controller
         return back()->with('success', 'Topic added.');
     }
 
+    public function update(Request $request, ContentTopic $contentTopic)
+    {
+        abort_unless(auth()->user()->hasRole('super-admin'), 403);
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'angle' => 'nullable|string',
+            'content_type' => 'required|in:technical,win,founder',
+        ]);
+
+        $contentTopic->update($data);
+
+        return back()->with('success', 'Topic updated.');
+    }
+
     public function recycle(ContentTopic $contentTopic)
     {
         abort_unless(auth()->user()->hasRole('super-admin'), 403);

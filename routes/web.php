@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/content-topics', [ContentTopicController::class, 'index'])->name('content-topics.index');
         Route::post('/content-topics', [ContentTopicController::class, 'store'])->name('content-topics.store');
+        Route::patch('/content-topics/{contentTopic}', [ContentTopicController::class, 'update'])->name('content-topics.update');
         Route::post('/content-topics/{contentTopic}/recycle', [ContentTopicController::class, 'recycle'])->name('content-topics.recycle');
         Route::delete('/content-topics/{contentTopic}', [ContentTopicController::class, 'destroy'])->name('content-topics.destroy');
 

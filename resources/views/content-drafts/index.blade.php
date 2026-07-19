@@ -3,6 +3,7 @@
 @section('header','Content')
 @section('content')
 <x-ui.page-header title="Content" subtitle="Drafts, schedule, and performance">
+    <x-ui.button variant="secondary" href="{{ route('content-topics.index') }}"><i class="fas fa-book"></i> Knowledge Bank</x-ui.button>
     <form action="{{ route('content-drafts.generate') }}" method="POST" class="inline">
         @csrf
         <x-ui.button type="submit"><i class="fas fa-wand-magic-sparkles"></i> Generate draft</x-ui.button>
