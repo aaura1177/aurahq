@@ -15,7 +15,7 @@
         @role('super-admin')
             <x-ui.button variant="secondary" :href="route('daily-focus.today')">My Day</x-ui.button>
         @endrole
-        <x-ui.button variant="primary" :href="route('tasks.personal', ['filter' => 'all'])">My Tasks</x-ui.button>
+        <x-ui.button variant="primary" :href="route('tasks.personal', ['filter' => 'open'])">My Tasks</x-ui.button>
     </x-ui.page-header>
 
     {{-- Row 1: stats --}}
@@ -122,7 +122,7 @@
                     @endforeach
                 </ul>
                 <div class="px-5 py-3 border-t border-slate-100">
-                    <a href="{{ route('tasks.personal', ['filter' => 'all']) }}" class="text-xs font-semibold text-brand-600 hover:underline">All my tasks →</a>
+                    <a href="{{ route('tasks.personal', ['filter' => 'open']) }}" class="text-xs font-semibold text-brand-600 hover:underline">All my tasks →</a>
                 </div>
             @endif
         </x-ui.card>

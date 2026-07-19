@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tasks/assignments', [TaskController::class, 'assignments'])->name('tasks.assignments');
     Route::patch('/tasks/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggleStatus'])->name('tasks.toggle');
+    Route::patch('/tasks/{task}/star', [TaskController::class, 'toggleStar'])->name('tasks.star')->middleware('permission:edit tasks');
     Route::post('/tasks/{task}/report', [TaskController::class, 'storeReport'])->name('tasks.report.store');
     Route::patch('/tasks/{task}/review', [TaskController::class, 'reviewTask'])->name('tasks.review');
     

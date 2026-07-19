@@ -16,7 +16,7 @@ class TaskController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:view tasks', only: ['index', 'personal', 'assignments', 'show']),
             new Middleware('permission:create tasks', only: ['create', 'store']),
-            new Middleware('permission:edit tasks', only: ['edit', 'update', 'toggleStatus', 'reviewTask', 'reorder']),
+            new Middleware('permission:edit tasks', only: ['edit', 'update', 'toggleStatus', 'toggleStar', 'reviewTask', 'reorder']),
             // Specific permissions for reporting
             new Middleware('permission:create task reports', only: ['storeReport']),
             new Middleware('permission:edit task reports', only: ['updateReport']),
@@ -27,68 +27,34 @@ class TaskController extends Controller implements HasMiddleware
     public function index() { return redirect()->route('tasks.assignments'); }
 
     public function personal(Request $request) {
-        $user = auth()->user();
-        $base = Task::where('category', 'admin_personal')
-            ->where('created_by', $user->id);
+        $user = $request->user();
+        $filter = $request->query('filter', 'open'); // open, starred, today, done
 
-        $filter = $request->query('filter', 'all');
-        $status = $request->query('status');
+        $query = Task::personal()->where('created_by', $user->id);
 
-        $query = (clone $base);
-
-        switch ($filter) {
-            case 'daily':
-                $query->where('frequency', 'daily');
-                break;
-            case 'weekly':
-                $query->where('frequency', 'weekly');
-                break;
-            case 'top_five':
-                $query->where('frequency', 'top_five');
-                break;
-            case 'urgent':
-                $query->whereIn('priority', ['urgent', 'critical']);
-                break;
-            case 'all':
-                // All active personal work — includes daily, weekly, and top_five
-                if (! $status) {
-                    $query->where('is_active', true)
-                        ->where('status', '!=', 'completed');
-                }
-                break;
-            default:
-                $query->where('frequency', $filter);
-                break;
+        if ($filter === 'open') $query->open();
+        elseif ($filter === 'starred') $query->open()->starred();
+        elseif ($filter === 'today') $query->open()->whereDate('due_date', today());
+        elseif ($filter === 'done') $query->done();
+        else {
+            $filter = 'open';
+            $query->open();
         }
 
-        if ($status) {
-            if ($status === 'active') {
-                $query->where('is_active', true);
-            } elseif ($status === 'inactive') {
-                $query->where('is_active', false);
-            } else {
-                $query->where('status', $status)->where('is_active', true);
-            }
-        } elseif ($filter !== 'all') {
-            $query->where('is_active', true);
-        }
-
-        $adminTasks = $query
-            ->orderByRaw("CASE priority WHEN 'critical' THEN 0 WHEN 'urgent' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END")
-            ->orderBy('due_date')
-            ->orderBy('id')
+        $tasks = $query->orderByDesc('is_starred')
+            ->orderByRaw("FIELD(priority,'critical','urgent','high','normal','low')")
+            ->orderBy('sort_order')
+            ->latest()
             ->get();
 
-        $activeBase = (clone $base)->where('is_active', true);
-        $filterCounts = [
-            'daily' => (clone $activeBase)->where('frequency', 'daily')->count(),
-            'weekly' => (clone $activeBase)->where('frequency', 'weekly')->count(),
-            'top_five' => (clone $activeBase)->where('frequency', 'top_five')->count(),
-            'urgent' => (clone $activeBase)->whereIn('priority', ['urgent', 'critical'])->count(),
-            'all' => (clone $activeBase)->where('status', '!=', 'completed')->count(),
+        $counts = [
+            'open' => Task::personal()->where('created_by',$user->id)->open()->count(),
+            'starred' => Task::personal()->where('created_by',$user->id)->open()->starred()->count(),
+            'today' => Task::personal()->where('created_by',$user->id)->open()->whereDate('due_date',today())->count(),
+            'done' => Task::personal()->where('created_by',$user->id)->done()->count(),
         ];
 
-        return view('tasks.personal', compact('adminTasks', 'filter', 'filterCounts'));
+        return view('tasks.personal', compact('tasks', 'filter', 'counts'));
     }
 
     public function assignments(Request $request) {
@@ -244,20 +210,14 @@ class TaskController extends Controller implements HasMiddleware
         return response()->json(['message' => 'Priority updated']);
     }
 
+    public function toggleStar(Task $task) {
+        $task->update(['is_starred' => ! $task->is_starred]);
+        return back();
+    }
+
     public function toggleStatus(Task $task) {
-        if (!$task->is_active && $task->category === 'admin_personal' && $task->frequency === 'top_five') {
-             $activeTopFive = Task::where('category', 'admin_personal')
-                ->where('created_by', auth()->id())
-                ->where('frequency', 'top_five')
-                ->where('is_active', true)
-                ->count();
-            if ($activeTopFive >= 5) {
-                return back()->with('error', 'Limit Reached: Cannot enable. Max 5 active Top Tasks allowed.');
-            }
-        }
-        $task->is_active = !$task->is_active;
-        $task->save();
-        return back()->with('success', 'Task availability updated.');
+        $task->update(['status' => $task->isDone() ? 'pending' : 'completed']);
+        return back();
     }
 
     public function storeReport(Request $request, Task $task) {
