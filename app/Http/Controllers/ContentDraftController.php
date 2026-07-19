@@ -45,11 +45,14 @@ class ContentDraftController extends Controller
         abort_unless(auth()->user()->hasRole('super-admin'), 403);
         $data = $request->validate([
             'status' => 'required|in:draft,approved,scheduled,posted',
-            'scheduled_for' => 'nullable|date',
+            'scheduled_for' => 'nullable|required_if:status,scheduled|date',
             'post_url' => 'nullable|url',
         ]);
         if ($data['status'] === 'posted' && empty($contentDraft->posted_at)) {
             $data['posted_at'] = now();
+        }
+        if ($data['status'] !== 'scheduled') {
+            $data['scheduled_for'] = null;
         }
         $contentDraft->update($data);
         return back()->with('success', 'Updated.');

@@ -30,7 +30,7 @@
             default => 'slate',
         };
     @endphp
-    <x-ui.card>
+    <x-ui.card x-data="{ scheduling: false }">
         <div class="flex items-center justify-between mb-2">
             <div class="flex gap-2 flex-wrap">
                 <x-ui.badge color="brand">{{ $d->platform }}</x-ui.badge>
@@ -41,20 +41,45 @@
         @if($d->hook)<p class="font-semibold text-slate-800 text-sm mb-1">{{ $d->hook }}</p>@endif
         <p class="text-sm text-slate-600 whitespace-pre-line line-clamp-6">{{ $d->body }}</p>
         @if($d->hashtags)<p class="text-xs text-brand-600 mt-2">{{ $d->hashtags }}</p>@endif
+        @if($d->status === 'scheduled' && $d->scheduled_for)
+            <div class="text-xs text-amber-600 mt-2"><i class="fas fa-clock"></i> Scheduled for {{ $d->scheduled_for->format('d M Y') }}</div>
+        @endif
         <div class="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 flex-wrap">
             <button type="button" onclick="navigator.clipboard.writeText(this.dataset.copy); this.textContent='Copied'"
                 data-copy="{{ e(($d->hook ? $d->hook."\n\n" : '').$d->body.($d->hashtags ? "\n\n".$d->hashtags : '')) }}"
                 class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium">Copy</button>
             @foreach(['draft'=>'Draft','approved'=>'Approve','scheduled'=>'Schedule','posted'=>'Posted'] as $s=>$lbl)
                 @if($d->status !== $s)
-                <form action="{{ route('content-drafts.status',$d->id) }}" method="POST" class="inline">
-                    @csrf @method('PATCH')
-                    <input type="hidden" name="status" value="{{ $s }}">
-                    <button type="submit" class="text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg">{{ $lbl }}</button>
-                </form>
+                    @if($s === 'scheduled')
+                        <div class="inline-flex items-center gap-1.5 flex-wrap">
+                            <button type="button" @click="scheduling = !scheduling"
+                                    class="text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg"
+                                    :class="scheduling && 'ring-1 ring-amber-400 border-amber-300'">
+                                Schedule
+                            </button>
+                            <form x-show="scheduling" x-cloak
+                                  action="{{ route('content-drafts.status', $d->id) }}" method="POST"
+                                  class="inline-flex items-center gap-1.5">
+                                @csrf @method('PATCH')
+                                <input type="hidden" name="status" value="scheduled">
+                                <input type="date" name="scheduled_for" required
+                                       value="{{ now('Asia/Kolkata')->toDateString() }}"
+                                       class="text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-white">
+                                <button type="submit" class="text-xs px-3 py-1.5 bg-amber-500 text-white hover:bg-amber-600 rounded-lg font-medium">
+                                    Confirm
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <form action="{{ route('content-drafts.status', $d->id) }}" method="POST" class="inline">
+                            @csrf @method('PATCH')
+                            <input type="hidden" name="status" value="{{ $s }}">
+                            <button type="submit" class="text-xs px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg">{{ $lbl }}</button>
+                        </form>
+                    @endif
                 @endif
             @endforeach
-            <form action="{{ route('content-drafts.destroy',$d->id) }}" method="POST" class="inline ml-auto" onsubmit="return confirm('Delete?')">
+            <form action="{{ route('content-drafts.destroy', $d->id) }}" method="POST" class="inline ml-auto" onsubmit="return confirm('Delete?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
             </form>
