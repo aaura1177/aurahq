@@ -5,7 +5,7 @@
     <div class="p-4 border-b border-slate-100 flex justify-between items-center">
         <h3 class="font-bold text-slate-700">Holiday List</h3>
         @can('create holidays')
-        <a href="{{ route('holidays.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 shadow">+ Add Holiday</a>
+        <a href="{{ route('holidays.create') }}" class="hq-btn hq-btn-primary">+ Add Holiday</a>
         @endcan
     </div>
     <div class="overflow-x-auto">

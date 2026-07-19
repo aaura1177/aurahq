@@ -4,16 +4,16 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <form method="GET" class="flex flex-wrap gap-2 items-center">
-            <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search name, company, email..." class="border rounded-lg px-3 py-2 text-sm w-full max-w-md">
-            <label class="flex items-center gap-2 text-sm text-slate-600">
+    <div class="hq-toolbar">
+        <form method="GET" class="hq-toolbar-filters">
+            <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search name, company, email..." class="hq-field" style="min-width:14rem; width:min(100%,20rem)">
+            <label class="flex items-center gap-2 text-sm text-slate-600 self-center">
                 <input type="checkbox" name="inactive" value="1" {{ !empty($filters['inactive']) ? 'checked' : '' }} onchange="this.form.submit()"> Show inactive
             </label>
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">Search</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Search</button>
         </form>
         @can('create clients')
-        <a href="{{ route('clients.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">Add client</a>
+        <a href="{{ route('clients.create') }}" class="hq-btn hq-btn-primary">Add client</a>
         @endcan
     </div>
 

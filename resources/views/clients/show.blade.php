@@ -14,10 +14,10 @@
         </div>
         <div class="flex gap-2">
             @can('create projects')
-            <a href="{{ route('projects.create', ['client_id' => $client->id]) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">New project</a>
+            <a href="{{ route('projects.create', ['client_id' => $client->id]) }}" class="hq-btn hq-btn-primary">New project</a>
             @endcan
             @can('edit clients')
-            <a href="{{ route('clients.edit', $client) }}" class="border border-slate-200 px-4 py-2 rounded-lg text-sm">Edit</a>
+            <a href="{{ route('clients.edit', $client) }}" class="hq-btn hq-btn-ghost">Edit</a>
             @endcan
         </div>
     </div>

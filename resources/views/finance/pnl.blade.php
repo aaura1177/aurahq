@@ -4,24 +4,24 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6">
-    <div class="flex flex-wrap justify-between items-center gap-4 print:hidden">
-        <form method="get" action="{{ route('finance.pnl') }}" class="flex flex-wrap items-end gap-3">
+    <div class="hq-toolbar print:hidden">
+        <form method="get" action="{{ route('finance.pnl') }}" class="hq-toolbar-filters">
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Month</label>
-                <input type="month" name="month" value="{{ $monthParam }}" class="border rounded-lg px-3 py-2 text-sm">
+                <label class="block text-xs text-slate-500 mb-1">Month</label>
+                <input type="month" name="month" value="{{ $monthParam }}" class="hq-field">
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Venture</label>
-                <select name="venture" class="border rounded-lg px-3 py-2 text-sm">
+                <label class="block text-xs text-slate-500 mb-1">Venture</label>
+                <select name="venture" class="hq-field">
                     <option value="all" {{ $venture === 'all' ? 'selected' : '' }}>All</option>
                     @foreach($ventures as $v)
                         <option value="{{ $v }}" {{ $venture === $v ? 'selected' : '' }}>{{ \App\Models\Finance::ventureLabel($v) }}</option>
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold">Apply</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Apply</button>
         </form>
-        <button type="button" onclick="window.print()" class="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700">Print</button>
+        <button type="button" onclick="window.print()" class="hq-btn hq-btn-primary">Print</button>
     </div>
 
     <div class="bg-white p-8 rounded-xl border border-slate-200 shadow-sm print:shadow-none print:border-0">

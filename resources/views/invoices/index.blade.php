@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-        <form method="GET" class="flex flex-wrap gap-2 items-end">
+    <div class="hq-toolbar">
+        <form method="GET" class="hq-toolbar-filters">
             <div>
                 <label class="block text-xs text-slate-500 mb-1">Status</label>
-                <select name="status" class="border rounded-lg px-3 py-2 text-sm bg-white">
+                <select name="status" class="hq-field">
                     <option value="">All</option>
                     @foreach(\App\Models\Invoice::STATUSES as $st)
                     <option value="{{ $st }}" {{ ($filters['status'] ?? '') === $st ? 'selected' : '' }}>{{ ucfirst($st) }}</option>
@@ -17,7 +17,7 @@
             </div>
             <div>
                 <label class="block text-xs text-slate-500 mb-1">Client</label>
-                <select name="client_id" class="border rounded-lg px-3 py-2 text-sm bg-white min-w-[160px]">
+                <select name="client_id" class="hq-field" style="min-width:10rem">
                     <option value="">All</option>
                     @foreach($clients as $c)
                     <option value="{{ $c->id }}" {{ ($filters['client_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
@@ -26,16 +26,16 @@
             </div>
             <div>
                 <label class="block text-xs text-slate-500 mb-1">From</label>
-                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}" class="border rounded-lg px-3 py-2 text-sm">
+                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}" class="hq-field">
             </div>
             <div>
                 <label class="block text-xs text-slate-500 mb-1">To</label>
-                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="border rounded-lg px-3 py-2 text-sm">
+                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="hq-field">
             </div>
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">Filter</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Filter</button>
         </form>
         @can('create invoices')
-        <a href="{{ route('invoices.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">New invoice</a>
+        <a href="{{ route('invoices.create') }}" class="hq-btn hq-btn-primary">New invoice</a>
         @endcan
     </div>
 

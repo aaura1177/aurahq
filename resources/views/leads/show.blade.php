@@ -22,7 +22,7 @@
                 </div>
                 <div class="flex gap-2">
                     @can('edit leads')
-                    <a href="{{ route('leads.edit', $lead) }}" class="text-sm px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-900">Edit</a>
+                    <a href="{{ route('leads.edit', $lead) }}" class="hq-btn hq-btn-secondary">Edit</a>
                     @endcan
                 </div>
             </div>
@@ -70,7 +70,7 @@
                         <textarea name="description" rows="2" class="w-full border rounded-lg p-2 text-sm" required placeholder="What happened?"></textarea>
                     </div>
                 </div>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">Save activity</button>
+                <button type="submit" class="hq-btn hq-btn-primary">Save activity</button>
             </form>
         </div>
         @endcan

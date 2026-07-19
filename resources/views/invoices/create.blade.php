@@ -69,8 +69,8 @@
             <textarea name="notes" rows="2" class="w-full border rounded-lg p-2.5 text-sm">{{ old('notes') }}</textarea>
         </div>
         <div class="flex gap-3">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold">Save</button>
-            <a href="{{ route('invoices.index') }}" class="px-6 py-2.5 border rounded-lg text-slate-600">Cancel</a>
+            <button type="submit" class="hq-btn hq-btn-primary">Save</button>
+            <a href="{{ route('invoices.index') }}" class="hq-btn hq-btn-ghost">Cancel</a>
         </div>
     </form>
 </div>

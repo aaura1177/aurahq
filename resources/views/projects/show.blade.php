@@ -15,10 +15,10 @@
         </div>
         <div class="flex gap-2">
             @can('create invoices')
-            <a href="{{ route('invoices.create', ['client_id' => $project->client_id, 'project_id' => $project->id]) }}" class="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">New invoice</a>
+            <a href="{{ route('invoices.create', ['client_id' => $project->client_id, 'project_id' => $project->id]) }}" class="hq-btn hq-btn-amber">New invoice</a>
             @endcan
             @can('edit projects')
-            <a href="{{ route('projects.edit', $project) }}" class="border border-slate-200 px-4 py-2 rounded-lg text-sm">Edit</a>
+            <a href="{{ route('projects.edit', $project) }}" class="hq-btn hq-btn-ghost">Edit</a>
             @endcan
         </div>
     </div>
@@ -69,7 +69,7 @@
             <div>
                 <input type="date" name="due_date" class="border rounded-lg p-2 text-sm">
             </div>
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">Add</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Add</button>
         </form>
         @endcan
     </div>

@@ -3,36 +3,31 @@
 @section('header', 'Task Assignments')
 
 @section('content')
-<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-    <div class="flex items-center gap-2 w-full md:w-auto">
-        <!-- Filters -->
-        <form action="{{ route('tasks.assignments') }}" method="GET" class="flex gap-2 flex-wrap">
-            @if(request('employee_id')) <input type="hidden" name="employee_id" value="{{ request('employee_id') }}"> @endif
-            
-            <select name="state" class="border rounded-lg px-3 py-2 text-sm bg-white" onchange="this.form.submit()">
-                <option value="active" {{ request('state') != 'disabled' ? 'selected' : '' }}>State: Active</option>
-                <option value="disabled" {{ request('state') == 'disabled' ? 'selected' : '' }}>State: Disabled</option>
-            </select>
-
-            <select name="priority" class="border rounded-lg px-3 py-2 text-sm bg-white" onchange="this.form.submit()">
-                <option value="">Priority: All</option>
-                <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>Normal</option>
-                <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
-                <option value="critical" {{ request('priority') == 'critical' ? 'selected' : '' }}>Critical</option>
-            </select>
-            <select name="status" class="border rounded-lg px-3 py-2 text-sm bg-white" onchange="this.form.submit()">
-                <option value="">Status: All</option>
-                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                <option value="almost_complete" {{ request('status') == 'almost_complete' ? 'selected' : '' }}>Almost Complete</option>
-                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>Reviewed</option>
-            </select>
-        </form>
-    </div>
+<div class="hq-toolbar mb-6">
+    <form action="{{ route('tasks.assignments') }}" method="GET" class="hq-toolbar-filters">
+        @if(request('employee_id')) <input type="hidden" name="employee_id" value="{{ request('employee_id') }}"> @endif
+        <select name="state" class="hq-field" onchange="this.form.submit()">
+            <option value="active" {{ request('state') != 'disabled' ? 'selected' : '' }}>State: Active</option>
+            <option value="disabled" {{ request('state') == 'disabled' ? 'selected' : '' }}>State: Disabled</option>
+        </select>
+        <select name="priority" class="hq-field" onchange="this.form.submit()">
+            <option value="">Priority: All</option>
+            <option value="normal" {{ request('priority') == 'normal' ? 'selected' : '' }}>Normal</option>
+            <option value="urgent" {{ request('priority') == 'urgent' ? 'selected' : '' }}>Urgent</option>
+            <option value="critical" {{ request('priority') == 'critical' ? 'selected' : '' }}>Critical</option>
+        </select>
+        <select name="status" class="hq-field" onchange="this.form.submit()">
+            <option value="">Status: All</option>
+            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+            <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+            <option value="almost_complete" {{ request('status') == 'almost_complete' ? 'selected' : '' }}>Almost Complete</option>
+            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+            <option value="reviewed" {{ request('status') == 'reviewed' ? 'selected' : '' }}>Reviewed</option>
+        </select>
+    </form>
     @can('create tasks')
-    <a href="{{ route('tasks.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow hover:bg-blue-700">+ Assign Task</a>
+    <a href="{{ route('tasks.create') }}" class="hq-btn hq-btn-primary">+ Assign Task</a>
     @endcan
 </div>
 

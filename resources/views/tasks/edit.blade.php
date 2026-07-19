@@ -72,9 +72,9 @@
             @endif
         </div>
 
-        <div class="flex gap-4 pt-4">
-            <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Update Task</button>
-            <a href="{{ $task->category == 'admin_personal' ? route('tasks.personal') : route('tasks.assignments') }}" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-lg font-bold text-center hover:bg-slate-200">Cancel</a>
+        <div class="flex gap-2 pt-4">
+            <button type="submit" class="hq-btn hq-btn-primary">Update Task</button>
+            <a href="{{ $task->category == 'admin_personal' ? route('tasks.personal') : route('tasks.assignments') }}" class="hq-btn hq-btn-ghost">Cancel</a>
         </div>
     </form>
 </div>

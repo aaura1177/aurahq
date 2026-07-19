@@ -141,6 +141,11 @@ class DashboardController extends Controller
             ? Venture::with('lastUpdate')->orderBy('name')->get()
             : collect();
 
+        $morningBrief = null;
+        if (auth()->user()->hasRole('super-admin')) {
+            $morningBrief = app(\App\Services\CommandCenterService::class)->morningBrief(auth()->user());
+        }
+
         return view('dashboard', compact(
             'totalSpending',
             'totalReceived',
@@ -171,6 +176,7 @@ class DashboardController extends Controller
             'activeClientsCount',
             'pendingInvoicesAmount',
             'dashboardVentures',
+            'morningBrief',
         ));
     }
 }

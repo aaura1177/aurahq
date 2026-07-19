@@ -38,6 +38,10 @@ class RoleController extends Controller implements HasMiddleware
         return redirect()->route('roles.index')->with('success', 'Role created.');
     }
 
+    public function show(Role $role) {
+        return redirect()->route('roles.edit', $role);
+    }
+
     public function edit(Role $role) {
         $permissions = Permission::all();
         return view('roles.edit', compact('role', 'permissions'));

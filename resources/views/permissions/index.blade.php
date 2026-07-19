@@ -4,7 +4,7 @@
 <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="p-4 border-b border-slate-100 flex justify-between items-center">
         <h3 class="font-bold text-slate-700">All Permissions</h3>
-        <a href="{{ route('permissions.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 shadow">+ Add Permission</a>
+        <a href="{{ route('permissions.create') }}" class="hq-btn hq-btn-primary">+ Add Permission</a>
     </div>
     <div class="p-4">
         <div class="overflow-x-auto">

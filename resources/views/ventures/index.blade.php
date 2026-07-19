@@ -4,7 +4,14 @@
 
 @section('content')
 <div class="space-y-6">
-    <p class="text-slate-600 text-sm max-w-3xl">Overview of Aurateria portfolio ventures — status, partners, activity, and linked work.</p>
+    <div class="flex flex-wrap items-start justify-between gap-3">
+        <p class="text-slate-600 text-sm max-w-3xl">Overview of Aurateria portfolio ventures — status, partners, activity, and linked work.</p>
+        @role('super-admin')
+        <a href="{{ route('ventures.create') }}" class="hq-btn hq-btn-primary">
+            <i class="fas fa-plus text-[10px]"></i> Add venture
+        </a>
+        @endrole
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         @foreach($ventures as $v)
@@ -24,7 +31,12 @@
                             </span>
                         </div>
                     </div>
-                    <a href="{{ route('ventures.show', $v) }}" class="text-sm font-semibold text-blue-600 hover:underline shrink-0">Open →</a>
+                    <div class="flex items-center gap-2 shrink-0">
+                        @role('super-admin')
+                        <a href="{{ route('ventures.edit', $v) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">Edit</a>
+                        @endrole
+                        <a href="{{ route('ventures.show', $v) }}" class="text-sm font-semibold text-blue-600 hover:underline">Open →</a>
+                    </div>
                 </div>
                 <div class="p-5 flex-1 space-y-3 text-sm text-slate-600">
                     @if($v->description)

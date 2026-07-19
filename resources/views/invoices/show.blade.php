@@ -37,18 +37,18 @@
 
     @can('edit invoices')
     <div class="flex flex-wrap gap-3">
-        <a href="{{ route('invoices.edit', $invoice) }}" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">Edit</a>
+        <a href="{{ route('invoices.edit', $invoice) }}" class="hq-btn hq-btn-secondary">Edit</a>
         <form action="{{ route('invoices.status', $invoice) }}" method="POST" class="inline">
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="sent">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">Mark sent</button>
+            <button type="submit" class="hq-btn hq-btn-primary">Mark sent</button>
         </form>
         <form action="{{ route('invoices.status', $invoice) }}" method="POST" class="inline">
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="paid">
-            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">Mark paid</button>
+            <button type="submit" class="hq-btn hq-btn-primary">Mark paid</button>
         </form>
     </div>
     @endcan

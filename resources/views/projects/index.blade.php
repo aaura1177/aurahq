@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <form method="GET" class="flex flex-wrap gap-2 items-end">
+    <div class="hq-toolbar">
+        <form method="GET" class="hq-toolbar-filters">
             <div>
                 <label class="block text-xs text-slate-500 mb-1">Status</label>
-                <select name="status" class="border rounded-lg px-3 py-2 text-sm bg-white">
+                <select name="status" class="hq-field">
                     <option value="">All</option>
                     @foreach(\App\Models\Project::STATUSES as $st)
                     <option value="{{ $st }}" {{ ($filters['status'] ?? '') === $st ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $st)) }}</option>
@@ -17,7 +17,7 @@
             </div>
             <div>
                 <label class="block text-xs text-slate-500 mb-1">Venture</label>
-                <select name="venture" class="border rounded-lg px-3 py-2 text-sm bg-white">
+                <select name="venture" class="hq-field">
                     <option value="">All</option>
                     @foreach(\App\Models\Project::VENTURES as $v)
                     <option value="{{ $v }}" {{ ($filters['venture'] ?? '') === $v ? 'selected' : '' }}>{{ ucfirst($v) }}</option>
@@ -26,17 +26,17 @@
             </div>
             <div>
                 <label class="block text-xs text-slate-500 mb-1">Client</label>
-                <select name="client_id" class="border rounded-lg px-3 py-2 text-sm bg-white min-w-[160px]">
+                <select name="client_id" class="hq-field" style="min-width:10rem">
                     <option value="">All</option>
                     @foreach($clients as $c)
                     <option value="{{ $c->id }}" {{ ($filters['client_id'] ?? '') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                     @endforeach
                 </select>
             </div>
-            <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">Filter</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Filter</button>
         </form>
         @can('create projects')
-        <a href="{{ route('projects.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">New project</a>
+        <a href="{{ route('projects.create') }}" class="hq-btn hq-btn-primary">New project</a>
         @endcan
     </div>
 

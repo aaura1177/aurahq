@@ -5,12 +5,21 @@
 @section('content')
 <div class="space-y-8 max-w-5xl">
     <div class="flex flex-wrap gap-4 items-start justify-between">
-        <div class="flex items-start gap-4">
+        <div class="flex items-start gap-4 min-w-0 flex-1">
             <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-slate-50 shrink-0" style="color: {{ $venture->color }}">
                 <i class="fas {{ $venture->icon }} text-2xl"></i>
             </div>
-            <div>
-                <p class="text-sm text-slate-500">Venture</p>
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <p class="text-sm text-slate-500">Venture</p>
+                    @role('super-admin')
+                    <a href="{{ route('ventures.edit', $venture) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">Edit</a>
+                    <form method="post" action="{{ route('ventures.destroy', $venture) }}" class="inline" onsubmit="return confirm('Delete this venture?');">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="text-xs font-semibold text-red-500 hover:text-red-700">Delete</button>
+                    </form>
+                    @endrole
+                </div>
                 <span class="inline-block mt-1 text-xs font-bold px-2 py-0.5 rounded
                     @if($venture->status === 'active') bg-green-100 text-green-800
                     @elseif($venture->status === 'paused') bg-amber-100 text-amber-800

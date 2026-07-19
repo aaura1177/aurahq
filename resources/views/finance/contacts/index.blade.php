@@ -5,7 +5,7 @@
     <div class="p-4 border-b border-slate-100 flex justify-between items-center">
         <h3 class="font-bold text-slate-700">Directory & Balances</h3>
         @can('create finance contacts')
-        <a href="{{ route('finance-contacts.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700">+ Add Contact</a>
+        <a href="{{ route('finance-contacts.create') }}" class="hq-btn hq-btn-primary">+ Add Contact</a>
         @endcan
     </div>
     <table class="w-full text-sm text-left">

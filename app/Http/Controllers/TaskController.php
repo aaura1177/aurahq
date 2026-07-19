@@ -16,7 +16,7 @@ class TaskController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:view tasks', only: ['index', 'personal', 'assignments', 'show']),
             new Middleware('permission:create tasks', only: ['create', 'store']),
-            new Middleware('permission:edit tasks', only: ['edit', 'update', 'toggleStatus', 'reviewTask']),
+            new Middleware('permission:edit tasks', only: ['edit', 'update', 'toggleStatus', 'reviewTask', 'reorder']),
             // Specific permissions for reporting
             new Middleware('permission:create task reports', only: ['storeReport']),
             new Middleware('permission:edit task reports', only: ['updateReport']),
@@ -28,44 +28,67 @@ class TaskController extends Controller implements HasMiddleware
 
     public function personal(Request $request) {
         $user = auth()->user();
-        $query = Task::where('category', 'admin_personal')
+        $base = Task::where('category', 'admin_personal')
             ->where('created_by', $user->id);
-            
-        $filter = $request->query('filter', 'daily');
+
+        $filter = $request->query('filter', 'all');
         $status = $request->query('status');
 
+        $query = (clone $base);
+
         switch ($filter) {
-            case 'daily': 
+            case 'daily':
                 $query->where('frequency', 'daily');
                 break;
-            case 'top_five': 
+            case 'weekly':
+                $query->where('frequency', 'weekly');
+                break;
+            case 'top_five':
                 $query->where('frequency', 'top_five');
                 break;
-            case 'urgent': 
+            case 'urgent':
                 $query->whereIn('priority', ['urgent', 'critical']);
                 break;
-            case 'all': 
-                if (!$status) {
-                     $query->where('is_active', true)
-                           ->where('status', '!=', 'completed')
-                           ->where('frequency', '!=', 'top_five');
+            case 'all':
+                // All active personal work — includes daily, weekly, and top_five
+                if (! $status) {
+                    $query->where('is_active', true)
+                        ->where('status', '!=', 'completed');
                 }
                 break;
-            default: 
+            default:
                 $query->where('frequency', $filter);
                 break;
         }
 
         if ($status) {
-            if ($status === 'active') $query->where('is_active', true);
-            elseif ($status === 'inactive') $query->where('is_active', false);
-            else $query->where('status', $status)->where('is_active', true);
-        } else {
-             if ($filter !== 'all') $query->where('is_active', true);
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            } else {
+                $query->where('status', $status)->where('is_active', true);
+            }
+        } elseif ($filter !== 'all') {
+            $query->where('is_active', true);
         }
 
-        $adminTasks = $query->latest()->get();
-        return view('tasks.personal', compact('adminTasks', 'filter'));
+        $adminTasks = $query
+            ->orderByRaw("CASE priority WHEN 'critical' THEN 0 WHEN 'urgent' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END")
+            ->orderBy('due_date')
+            ->orderBy('id')
+            ->get();
+
+        $activeBase = (clone $base)->where('is_active', true);
+        $filterCounts = [
+            'daily' => (clone $activeBase)->where('frequency', 'daily')->count(),
+            'weekly' => (clone $activeBase)->where('frequency', 'weekly')->count(),
+            'top_five' => (clone $activeBase)->where('frequency', 'top_five')->count(),
+            'urgent' => (clone $activeBase)->whereIn('priority', ['urgent', 'critical'])->count(),
+            'all' => (clone $activeBase)->where('status', '!=', 'completed')->count(),
+        ];
+
+        return view('tasks.personal', compact('adminTasks', 'filter', 'filterCounts'));
     }
 
     public function assignments(Request $request) {
@@ -189,6 +212,36 @@ class TaskController extends Controller implements HasMiddleware
 
         $task->update($data);
         return redirect()->route($task->category == 'admin_personal' ? 'tasks.personal' : 'tasks.assignments')->with('success', 'Task updated.');
+    }
+
+    public function reorder(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:tasks,id',
+        ]);
+
+        $user = auth()->user();
+        $ids = $data['ids'];
+
+        foreach ($ids as $index => $id) {
+            $task = Task::find($id);
+            if (! $task) {
+                continue;
+            }
+            // Only allow reordering own personal tasks (or assignments you can edit)
+            $allowed = $task->created_by === $user->id
+                || $task->assigned_to === $user->id
+                || $user->hasRole(['super-admin', 'admin']);
+            if (! $allowed) {
+                abort(403);
+            }
+
+            $priority = $index === 0 ? 'critical' : ($index === 1 ? 'urgent' : 'normal');
+            $task->update(['priority' => $priority]);
+        }
+
+        return response()->json(['message' => 'Priority updated']);
     }
 
     public function toggleStatus(Task $task) {

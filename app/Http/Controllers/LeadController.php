@@ -186,11 +186,19 @@ class LeadController extends Controller implements HasMiddleware
 
         $newStage = $request->stage;
         if ($newStage === 'lost' && ! $request->filled('lost_reason')) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Please provide a lost reason.'], 422);
+            }
+
             return back()->with('error', 'Please provide a lost reason.');
         }
 
         $oldStage = $lead->stage;
         if ($oldStage === $newStage) {
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Unchanged', 'stage' => $lead->stage]);
+            }
+
             return back();
         }
 
@@ -222,6 +230,13 @@ class LeadController extends Controller implements HasMiddleware
             'description' => "Stage changed from {$oldStage} to {$newStage}",
             'metadata' => ['from' => $oldStage, 'to' => $newStage],
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Stage updated',
+                'stage' => $lead->stage,
+            ]);
+        }
 
         return back()->with('success', 'Stage updated.');
     }

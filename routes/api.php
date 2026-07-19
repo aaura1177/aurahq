@@ -242,4 +242,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:super-admin')->get('morning-brief', [\App\Http\Controllers\Api\MorningBriefApiController::class, 'index']);
+
+    Route::middleware('role:super-admin')->group(function () {
+        Route::get('content-topics', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'index']);
+        Route::get('content-topics/next', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'next']);
+        Route::post('content-topics', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'store']);
+    });
 });

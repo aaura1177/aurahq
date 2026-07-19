@@ -23,6 +23,8 @@ use App\Http\Controllers\FinanceDashboardController;
 use App\Http\Controllers\RevenueTargetController;
 use App\Http\Controllers\VentureController;
 use App\Http\Controllers\DailyFocusController;
+use App\Http\Controllers\ContentTopicController;
+use App\Http\Controllers\AiCommandController;
 
 Route::get('/', function () { return redirect()->route('login'); });
 
@@ -47,6 +49,13 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
         Route::resource('permissions', PermissionController::class);
+
+        Route::get('/content-topics', [ContentTopicController::class, 'index'])->name('content-topics.index');
+        Route::post('/content-topics', [ContentTopicController::class, 'store'])->name('content-topics.store');
+        Route::post('/content-topics/{contentTopic}/recycle', [ContentTopicController::class, 'recycle'])->name('content-topics.recycle');
+        Route::delete('/content-topics/{contentTopic}', [ContentTopicController::class, 'destroy'])->name('content-topics.destroy');
+
+        Route::post('/ai/command', AiCommandController::class)->name('ai.command');
     });
 
     // Finance
@@ -60,6 +69,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Ventures
     Route::get('/ventures', [VentureController::class, 'index'])->name('ventures.index');
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::get('/ventures/create', [VentureController::class, 'create'])->name('ventures.create');
+        Route::post('/ventures', [VentureController::class, 'store'])->name('ventures.store');
+        Route::get('/ventures/{venture:slug}/edit', [VentureController::class, 'edit'])->name('ventures.edit');
+        Route::put('/ventures/{venture:slug}', [VentureController::class, 'update'])->name('ventures.update');
+        Route::delete('/ventures/{venture:slug}', [VentureController::class, 'destroy'])->name('ventures.destroy');
+    });
     Route::get('/ventures/{venture:slug}', [VentureController::class, 'show'])->name('ventures.show');
     Route::post('/ventures/{venture:slug}/updates', [VentureController::class, 'addUpdate'])->name('ventures.updates.store');
 
@@ -69,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     // Tasks (Advanced)
     Route::get('/tasks/personal', [TaskController::class, 'personal'])->name('tasks.personal');
     Route::get('/tasks/assignments', [TaskController::class, 'assignments'])->name('tasks.assignments');
+    Route::patch('/tasks/reorder', [TaskController::class, 'reorder'])->name('tasks.reorder');
     Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggleStatus'])->name('tasks.toggle');
     Route::post('/tasks/{task}/report', [TaskController::class, 'storeReport'])->name('tasks.report.store');
     Route::patch('/tasks/{task}/review', [TaskController::class, 'reviewTask'])->name('tasks.review');

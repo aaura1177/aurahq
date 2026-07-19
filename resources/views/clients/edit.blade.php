@@ -40,8 +40,8 @@
             <input type="checkbox" name="is_active" value="1" {{ old('is_active', $client->is_active) ? 'checked' : '' }}> Active
         </label>
         <div class="flex gap-3">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700">Save</button>
-            <a href="{{ route('clients.show', $client) }}" class="px-6 py-2.5 rounded-lg border text-slate-600">Cancel</a>
+            <button type="submit" class="hq-btn hq-btn-primary">Save</button>
+            <a href="{{ route('clients.show', $client) }}" class="hq-btn hq-btn-ghost">Cancel</a>
         </div>
     </form>
 </div>

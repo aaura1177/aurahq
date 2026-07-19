@@ -24,13 +24,13 @@ class DailyFocusApiController extends Controller
         );
 
         $availableTasks = Task::query()
+            ->where('category', 'admin_personal')
+            ->where('created_by', $user->id)
             ->where('is_active', true)
             ->where('status', '!=', 'completed')
-            ->where(function ($q) use ($user) {
-                $q->where('created_by', $user->id)->orWhere('assigned_to', $user->id);
-            })
             ->orderByRaw("CASE priority WHEN 'critical' THEN 0 WHEN 'urgent' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END")
             ->orderBy('due_date')
+            ->orderBy('id')
             ->get();
 
         $yesterday = DailyFocus::query()
@@ -96,7 +96,11 @@ class DailyFocusApiController extends Controller
             $idKey = $slot.'_id';
             if (! empty($validated[$idKey] ?? null)) {
                 $task = Task::find($validated[$idKey]);
-                if (! $task || ($task->created_by !== $user->id && $task->assigned_to !== $user->id)) {
+                if (
+                    ! $task
+                    || $task->category !== 'admin_personal'
+                    || $task->created_by !== $user->id
+                ) {
                     return response()->json([
                         'message' => 'Validation failed',
                         'errors' => [$idKey => ['The selected task is invalid or not yours.']],

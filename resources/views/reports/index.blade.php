@@ -71,9 +71,6 @@
     @endif
 </div>
 
-<!-- AlpineJS for Tabs -->
-<script src="//[unpkg.com/alpinejs](https://unpkg.com/alpinejs)" defer></script>
-
 <!-- Chart Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {

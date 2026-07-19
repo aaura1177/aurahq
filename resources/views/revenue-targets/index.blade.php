@@ -6,8 +6,8 @@
 <div class="space-y-4">
     <div class="flex justify-between items-center">
         @can('create revenue targets')
-        <a href="{{ route('revenue-targets.create') }}" class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">
-            <i class="fas fa-plus"></i> New target
+        <a href="{{ route('revenue-targets.create') }}" class="hq-btn hq-btn-primary">
+            <i class="fas fa-plus text-[10px]"></i> New target
         </a>
         @endcan
     </div>

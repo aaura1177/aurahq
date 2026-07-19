@@ -4,22 +4,24 @@
 
 @section('content')
 <div class="space-y-6">
-    <form method="get" action="{{ route('finance.dashboard') }}" class="flex flex-wrap items-end gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Month</label>
-            <input type="month" name="month" value="{{ $monthParam }}" class="border rounded-lg px-3 py-2 text-sm">
+    <form method="get" action="{{ route('finance.dashboard') }}" class="hq-toolbar bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <div class="hq-toolbar-filters">
+            <div>
+                <label class="block text-xs text-slate-500 mb-1">Month</label>
+                <input type="month" name="month" value="{{ $monthParam }}" class="hq-field">
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 mb-1">Venture</label>
+                <select name="venture" class="hq-field" style="min-width:10rem">
+                    <option value="all" {{ $venture === 'all' ? 'selected' : '' }}>All ventures</option>
+                    @foreach($ventures as $v)
+                        <option value="{{ $v }}" {{ $venture === $v ? 'selected' : '' }}>{{ \App\Models\Finance::ventureLabel($v) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="hq-btn hq-btn-secondary">Apply</button>
         </div>
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Venture</label>
-            <select name="venture" class="border rounded-lg px-3 py-2 text-sm min-w-[160px]">
-                <option value="all" {{ $venture === 'all' ? 'selected' : '' }}>All ventures</option>
-                @foreach($ventures as $v)
-                    <option value="{{ $v }}" {{ $venture === $v ? 'selected' : '' }}>{{ \App\Models\Finance::ventureLabel($v) }}</option>
-                @endforeach
-            </select>
-        </div>
-        <button type="submit" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-900">Apply</button>
-        <a href="{{ route('finance.pnl', request()->query()) }}" target="_blank" class="text-sm text-blue-600 font-semibold hover:underline ml-auto">Detailed P&amp;L (print)</a>
+        <a href="{{ route('finance.pnl', request()->query()) }}" target="_blank" class="text-sm text-blue-600 font-semibold hover:underline">Detailed P&amp;L (print)</a>
     </form>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

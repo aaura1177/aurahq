@@ -13,9 +13,7 @@
             <span>Conversion: <strong class="text-slate-800">{{ $conversionRate }}%</strong></span>
         </div>
         @can('create leads')
-        <a href="{{ route('leads.create') }}" class="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition text-sm">
-            <i class="fas fa-plus"></i> Add Lead
-        </a>
+        <a href="{{ route('leads.create') }}" class="hq-btn hq-btn-primary"><i class="fas fa-plus text-[10px]"></i> Add Lead</a>
         @endcan
     </div>
 

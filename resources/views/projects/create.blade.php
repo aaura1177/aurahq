@@ -61,8 +61,8 @@
             </div>
         </div>
         <div class="flex gap-3">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold">Create</button>
-            <a href="{{ route('projects.index') }}" class="px-6 py-2.5 border rounded-lg text-slate-600">Cancel</a>
+            <button type="submit" class="hq-btn hq-btn-primary">Create</button>
+            <a href="{{ route('projects.index') }}" class="hq-btn hq-btn-ghost">Cancel</a>
         </div>
     </form>
 </div>

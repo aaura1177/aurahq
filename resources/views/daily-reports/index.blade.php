@@ -2,12 +2,12 @@
 @section('header', 'Daily Reports')
 @section('content')
 <div class="space-y-6">
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-        <form method="GET" action="{{ route('daily-reports.index') }}" class="flex flex-wrap items-end gap-4">
+    <div class="hq-toolbar">
+        <form method="GET" action="{{ route('daily-reports.index') }}" class="hq-toolbar-filters">
             @role('super-admin')
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Employee</label>
-                <select name="employee_id" class="border border-slate-200 rounded-lg px-3 py-2 min-w-[200px]">
+                <label class="block text-xs text-slate-500 mb-1">Employee</label>
+                <select name="employee_id" class="hq-field" style="min-width:10rem">
                     <option value="">All</option>
                     @foreach($employees as $emp)
                     <option value="{{ $emp->id }}" {{ $employeeId == $emp->id ? 'selected' : '' }}>{{ $emp->name }}</option>
@@ -16,23 +16,21 @@
             </div>
             @endrole
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">From</label>
-                <input type="date" name="start_date" value="{{ $start->format('Y-m-d') }}" class="border border-slate-200 rounded-lg px-3 py-2">
+                <label class="block text-xs text-slate-500 mb-1">From</label>
+                <input type="date" name="start_date" value="{{ $start->format('Y-m-d') }}" class="hq-field">
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">To</label>
-                <input type="date" name="end_date" value="{{ $end->format('Y-m-d') }}" class="border border-slate-200 rounded-lg px-3 py-2">
+                <label class="block text-xs text-slate-500 mb-1">To</label>
+                <input type="date" name="end_date" value="{{ $end->format('Y-m-d') }}" class="hq-field">
             </div>
-            <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-800">Apply</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Apply</button>
         </form>
-    </div>
-
-    <div class="flex justify-between items-center flex-wrap gap-2">
-        <p class="text-sm text-slate-600">Reporting windows (IST): Morning till 11:00 AM · Evening till 5:15 PM (on present days)</p>
         @can('create daily reports')
-        <a href="{{ route('daily-reports.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">+ Report</a>
+        <a href="{{ route('daily-reports.create') }}" class="hq-btn hq-btn-primary">+ Report</a>
         @endcan
     </div>
+
+    <p class="text-sm text-slate-600">Reporting windows (IST): Morning till 11:00 AM · Evening till 5:15 PM (on present days)</p>
 
     {{-- Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

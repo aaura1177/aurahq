@@ -93,8 +93,8 @@
             <textarea name="notes" rows="3" class="w-full border rounded-lg p-2.5 text-sm">{{ old('notes') }}</textarea>
         </div>
         <div class="flex gap-3">
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700">Create lead</button>
-            <a href="{{ route('leads.index') }}" class="px-6 py-2.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</a>
+            <button type="submit" class="hq-btn hq-btn-primary">Create lead</button>
+            <a href="{{ route('leads.index') }}" class="hq-btn hq-btn-ghost">Cancel</a>
         </div>
     </form>
 </div>

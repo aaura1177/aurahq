@@ -3,11 +3,11 @@
 @section('content')
 <div class="space-y-6">
     {{-- Filters --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-        <form method="GET" action="{{ route('attendance.index') }}" class="flex flex-wrap items-end gap-4">
+    <div class="hq-toolbar">
+        <form method="GET" action="{{ route('attendance.index') }}" class="hq-toolbar-filters">
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Employee</label>
-                <select name="employee_id" class="border border-slate-200 rounded-lg px-3 py-2 min-w-[200px]">
+                <label class="block text-xs text-slate-500 mb-1">Employee</label>
+                <select name="employee_id" class="hq-field" style="min-width:10rem">
                     <option value="" {{ !$employeeId ? 'selected' : '' }}>All</option>
                     @foreach($employees as $emp)
                     <option value="{{ $emp->id }}" {{ $employeeId == $emp->id ? 'selected' : '' }}>{{ $emp->name }}</option>
@@ -15,15 +15,23 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">From</label>
-                <input type="date" name="start_date" value="{{ $start->format('Y-m-d') }}" class="border border-slate-200 rounded-lg px-3 py-2">
+                <label class="block text-xs text-slate-500 mb-1">From</label>
+                <input type="date" name="start_date" value="{{ $start->format('Y-m-d') }}" class="hq-field">
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">To</label>
-                <input type="date" name="end_date" value="{{ $end->format('Y-m-d') }}" class="border border-slate-200 rounded-lg px-3 py-2">
+                <label class="block text-xs text-slate-500 mb-1">To</label>
+                <input type="date" name="end_date" value="{{ $end->format('Y-m-d') }}" class="hq-field">
             </div>
-            <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-800">Apply</button>
+            <button type="submit" class="hq-btn hq-btn-secondary">Apply</button>
         </form>
+        <div class="flex gap-2">
+            @can('view attendance')
+            <a href="{{ route('attendance.report') }}" class="hq-btn hq-btn-ghost">Period Report</a>
+            @endcan
+            @can('create attendance')
+            <a href="{{ route('attendance.create') }}" class="hq-btn hq-btn-primary">+ Mark Attendance</a>
+            @endcan
+        </div>
     </div>
 
     @if($employeeId)
@@ -47,14 +55,6 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-4 border-b border-slate-100 flex justify-between items-center flex-wrap gap-2">
             <h3 class="font-bold text-slate-700">Attendance {{ $selectedEmployee ? '• ' . $selectedEmployee->name : '• All employees' }} ({{ $start->format('d M Y') }}{{ $start->format('Y-m-d') !== $end->format('Y-m-d') ? ' – ' . $end->format('d M Y') : '' }})</h3>
-            <div class="flex gap-2">
-                @can('view attendance')
-                <a href="{{ route('attendance.report') }}" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-700">Period Report</a>
-                @endcan
-                @can('create attendance')
-                <a href="{{ route('attendance.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">+ Mark Attendance</a>
-                @endcan
-            </div>
         </div>
         @if($employeeId)
         <div class="overflow-x-auto">

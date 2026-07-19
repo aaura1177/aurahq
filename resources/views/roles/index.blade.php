@@ -4,7 +4,7 @@
 <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="p-4 border-b border-slate-100 flex justify-between items-center">
         <h3 class="font-bold text-slate-700">System Roles</h3>
-        <a href="{{ route('roles.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 shadow">+ Create Role</a>
+        <a href="{{ route('roles.create') }}" class="hq-btn hq-btn-primary">+ Create Role</a>
     </div>
     <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         @foreach($roles as $role)
