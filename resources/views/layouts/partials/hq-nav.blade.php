@@ -60,10 +60,10 @@
 
     @role('super-admin')
     <li>
-        <a href="{{ route('content-topics.index') }}"
+        <a href="{{ route('content-drafts.index') }}"
            class="group flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition
-                  {{ request()->routeIs('content-topics.*') ? 'bg-navy-800 text-white' : 'text-slate-300 hover:bg-navy-800/60 hover:text-white' }}">
-            <i class="fas fa-lightbulb w-5 text-center {{ request()->routeIs('content-topics.*') ? 'text-brand-400' : 'text-slate-500 group-hover:text-brand-400' }}"></i>
+                  {{ request()->routeIs('content-drafts.*') || request()->routeIs('content-topics.*') ? 'bg-navy-800 text-white' : 'text-slate-300 hover:bg-navy-800/60 hover:text-white' }}">
+            <i class="fas fa-lightbulb w-5 text-center {{ request()->routeIs('content-drafts.*') || request()->routeIs('content-topics.*') ? 'text-brand-400' : 'text-slate-500 group-hover:text-brand-400' }}"></i>
             Content
         </a>
     </li>

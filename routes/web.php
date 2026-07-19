@@ -24,6 +24,7 @@ use App\Http\Controllers\RevenueTargetController;
 use App\Http\Controllers\VentureController;
 use App\Http\Controllers\DailyFocusController;
 use App\Http\Controllers\ContentTopicController;
+use App\Http\Controllers\ContentDraftController;
 use App\Http\Controllers\AiCommandController;
 
 Route::get('/', function () { return redirect()->route('login'); });
@@ -54,6 +55,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/content-topics', [ContentTopicController::class, 'store'])->name('content-topics.store');
         Route::post('/content-topics/{contentTopic}/recycle', [ContentTopicController::class, 'recycle'])->name('content-topics.recycle');
         Route::delete('/content-topics/{contentTopic}', [ContentTopicController::class, 'destroy'])->name('content-topics.destroy');
+
+        Route::get('/content-drafts', [ContentDraftController::class, 'index'])->name('content-drafts.index');
+        Route::post('/content-drafts', [ContentDraftController::class, 'store'])->name('content-drafts.store');
+        Route::post('/content-drafts/generate', [ContentDraftController::class, 'generate'])->name('content-drafts.generate');
+        Route::patch('/content-drafts/{contentDraft}/status', [ContentDraftController::class, 'updateStatus'])->name('content-drafts.status');
+        Route::delete('/content-drafts/{contentDraft}', [ContentDraftController::class, 'destroy'])->name('content-drafts.destroy');
 
         Route::post('/ai/command', AiCommandController::class)->name('ai.command');
     });
