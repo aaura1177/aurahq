@@ -29,7 +29,7 @@ use App\Http\Controllers\Api\RevenueTargetApiController;
 use App\Http\Controllers\Api\VentureApiController;
 use App\Http\Controllers\Api\DailyFocusApiController;
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
@@ -241,11 +241,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::match(['put', 'patch'], 'daily-focus/{dailyFocus}', [DailyFocusApiController::class, 'update']);
     });
 
-    Route::middleware('role:super-admin')->get('morning-brief', [\App\Http\Controllers\Api\MorningBriefApiController::class, 'index']);
+    Route::middleware('permission:view tasks')->get('morning-brief', [\App\Http\Controllers\Api\MorningBriefApiController::class, 'index']);
 
+    Route::middleware('permission:view tasks')->get('content-topics/next', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'next']);
     Route::middleware('role:super-admin')->group(function () {
         Route::get('content-topics', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'index']);
-        Route::get('content-topics/next', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'next']);
         Route::post('content-topics', [\App\Http\Controllers\Api\ContentTopicApiController::class, 'store']);
     });
 });
