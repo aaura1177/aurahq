@@ -50,6 +50,21 @@
         </div>
     </x-ui.card>
 
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <a href="{{ route('finance.create') }}" class="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-400 hover:shadow transition text-sm font-medium text-slate-700">
+            <i class="fas fa-plus text-green-500"></i> Log Money
+        </a>
+        <a href="{{ route('leads.create') }}" class="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-400 hover:shadow transition text-sm font-medium text-slate-700">
+            <i class="fas fa-user-plus text-brand-500"></i> Add Lead
+        </a>
+        <a href="{{ route('tasks.create') }}" class="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-400 hover:shadow transition text-sm font-medium text-slate-700">
+            <i class="fas fa-circle-plus text-blue-500"></i> Add Task
+        </a>
+        <a href="{{ route('invoices.create') }}" class="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-brand-400 hover:shadow transition text-sm font-medium text-slate-700">
+            <i class="fas fa-file-invoice text-amber-500"></i> New Invoice
+        </a>
+    </div>
+
     {{-- Row 1: stats --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="{{ route('finance.dashboard') }}" class="block hover:opacity-95 transition">
