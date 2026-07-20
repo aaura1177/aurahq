@@ -78,9 +78,9 @@
     <li>
         <a href="{{ route('daily-reports.index') }}"
            class="group flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition
-                  {{ request()->routeIs('daily-reports.*') || request()->routeIs('attendance.*') || request()->routeIs('holidays.*') ? 'bg-navy-800 text-white' : 'text-slate-400 hover:bg-navy-800/50 hover:text-slate-200' }}">
-            <i class="fas fa-users w-5 text-center {{ request()->routeIs('daily-reports.*') || request()->routeIs('attendance.*') || request()->routeIs('holidays.*') ? 'text-brand-400' : 'text-slate-600 group-hover:text-brand-400' }}"></i>
-            Team
+                  {{ request()->routeIs('daily-reports.*') ? 'bg-navy-800 text-white' : 'text-slate-400 hover:bg-navy-800/50 hover:text-slate-200' }}">
+            <i class="fas fa-clipboard-list w-5 text-center {{ request()->routeIs('daily-reports.*') ? 'text-brand-400' : 'text-slate-600 group-hover:text-brand-400' }}"></i>
+            Daily Reports
         </a>
     </li>
     @endif
