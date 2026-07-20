@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Lead;
 use App\Models\RevenueTarget;
 use App\Models\Task;
+use App\Support\RevenueProgress;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -68,6 +69,9 @@ class DashboardController extends Controller
             ->whereNotNull('morning_submitted_at')
             ->exists();
 
+        $revMonth = RevenueProgress::currentMonth();
+        $revMillion = RevenueProgress::towardMillion();
+
         return view('dashboard', compact(
             'todayFocus',
             'topTasks',
@@ -80,6 +84,8 @@ class DashboardController extends Controller
             'unpaidCount',
             'unpaidTotal',
             'reportStatus',
+            'revMonth',
+            'revMillion',
         ));
     }
 }

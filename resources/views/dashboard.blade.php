@@ -18,6 +18,38 @@
         <x-ui.button variant="primary" :href="route('tasks.personal', ['filter' => 'open'])">My Tasks</x-ui.button>
     </x-ui.page-header>
 
+    <x-ui.card class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Road to ₹8.5 Cr · $1M by May 2027</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">
+                    {{ \App\Support\RevenueProgress::inr($revMillion['actual']) }}
+                    <span class="text-slate-400 text-lg">/ ₹8.5Cr</span>
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-3xl font-bold text-brand-600">{{ $revMillion['pct'] }}%</p>
+            </div>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+            <div class="bg-brand-600 h-3 rounded-full transition-all" style="width: {{ min($revMillion['pct'], 100) }}%"></div>
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-4 text-center pt-4 border-t border-slate-100">
+            <div>
+                <p class="text-xs text-slate-500">This Month Target</p>
+                <p class="text-sm font-bold text-slate-800">{{ \App\Support\RevenueProgress::inr($revMonth['target']) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-slate-500">Collected</p>
+                <p class="text-sm font-bold text-green-600">{{ \App\Support\RevenueProgress::inr($revMonth['actual']) }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-slate-500">{{ $revMonth['days_left'] }}d left · gap</p>
+                <p class="text-sm font-bold text-amber-600">{{ \App\Support\RevenueProgress::inr($revMonth['gap']) }}</p>
+            </div>
+        </div>
+    </x-ui.card>
+
     {{-- Row 1: stats --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="{{ route('finance.dashboard') }}" class="block hover:opacity-95 transition">
